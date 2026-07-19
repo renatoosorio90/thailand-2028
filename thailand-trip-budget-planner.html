@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trip Budget Planner — Koh Samui 2028</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg: #0a1e21;
+    --bg-deep: #061618;
+    --panel: #102c2f;
+    --panel-line: rgba(243,238,226,0.10);
+    --gold: #cfa53d;
+    --coral: #e4694a;
+    --green: #7fae82;
+    --text: #f3eee2;
+    --text-dim: #9db0ac;
+    --text-faint: #6d8480;
+    --max: 1040px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,h2,h3{ font-family: 'Fraunces', serif; font-weight: 500; margin: 0; }
+  .mono{ font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.03em; }
+  .wrap{ max-width: var(--max); margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- HERO ---------- */
+
+  .hero{
+    padding: 90px 24px 60px;
+    text-align:center;
+    background: radial-gradient(ellipse at 50% 0%, #163a3e 0%, transparent 60%), linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 70%);
+    border-bottom: 1px solid var(--panel-line);
+  }
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 11px;
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+
+  .hero h1{
+    font-size: clamp(30px, 5vw, 46px);
+    font-weight: 400;
+    max-width: 18ch;
+    margin: 0 auto;
+  }
+  .hero h1 em{ color: var(--gold); font-style: italic; }
+
+  .hero p.sub{
+    max-width: 52ch;
+    margin: 20px auto 0;
+    color: var(--text-dim);
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  /* ---------- TABS ---------- */
+
+  .tab-nav{
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display:flex;
+    justify-content:center;
+    gap: 2px;
+    background: var(--bg-deep);
+    border-bottom: 1px solid var(--panel-line);
+    padding: 0 24px;
+  }
+
+  .tab-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    padding: 20px 26px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color .15s ease, border-color .15s ease;
+  }
+
+  .tab-btn:hover{ color: var(--text-dim); }
+
+  .tab-btn.active{
+    color: var(--gold);
+    border-bottom: 2px solid var(--gold);
+  }
+
+  .tab-panel{ display:none; padding: 60px 0 100px; }
+  .tab-panel.active{ display:block; }
+
+  /* ---------- TIMELINE STRIP ---------- */
+
+  .timeline{
+    display:flex;
+    align-items:center;
+    gap: 0;
+    margin-bottom: 48px;
+    border: 1px solid var(--panel-line);
+    background: var(--panel);
+  }
+
+  .tl-seg{
+    flex: 1;
+    padding: 22px 20px;
+    position: relative;
+    border-right: 1px solid var(--panel-line);
+  }
+  .tl-seg:last-child{ border-right: none; }
+
+  .tl-seg .tl-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--coral);
+    margin-bottom: 8px;
+  }
+  .tl-seg .tl-dates{ font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .tl-seg .tl-nights{ font-size: 12.5px; color: var(--text-dim); font-weight: 300; }
+  .tl-seg.is-birthday{ background: linear-gradient(180deg, rgba(207,165,61,0.10), transparent); }
+  .tl-seg.is-birthday .tl-label{ color: var(--gold); }
+  .tl-seg .bday-flag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    margin-top: 8px;
+    display:inline-block;
+    border: 1px solid var(--gold);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  @media(max-width: 720px){
+    .timeline{ flex-direction: column; }
+    .tl-seg{ border-right: none; border-bottom: 1px solid var(--panel-line); }
+    .tl-seg:last-child{ border-bottom: none; }
+  }
+
+  /* ---------- SECTION HEAD ---------- */
+
+  .section-head{ margin: 56px 0 24px; }
+  .section-head h2{ font-size: 20px; font-weight: 500; }
+  .section-head p{ color: var(--text-dim); font-size: 13.5px; font-weight: 300; margin-top: 6px; max-width: 60ch; }
+  .section-head:first-of-type{ margin-top: 0; }
+
+  /* ---------- COST CARDS ---------- */
+
+  .card-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+  }
+  @media(max-width: 720px){ .card-grid{ grid-template-columns: 1fr; } }
+
+  .cost-card{
+    background: var(--panel);
+    padding: 26px 26px;
+    position: relative;
+  }
+
+  .cost-card .card-badge{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+    padding: 3px 7px;
+    border-radius: 3px;
+    margin-bottom: 12px;
+  }
+  .cost-card .card-badge.warn{ color: var(--coral); border-color: var(--coral); }
+
+  .cost-card h3{ font-size: 17px; font-weight: 500; margin-bottom: 4px; }
+  .cost-card h3 a{
+    color: var(--text);
+    text-decoration: none;
+    background-image: linear-gradient(var(--gold), var(--gold));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition: color .15s ease;
+  }
+  .cost-card h3 a:hover{ color: var(--gold); background-size: 100% 1px; }
+  .cost-card .card-loc{ font-size: 12px; color: var(--text-faint); margin-bottom: 12px; }
+  .cost-card p.desc{ font-size: 13.5px; color: var(--text-dim); font-weight: 300; margin: 0 0 14px; }
+
+  .cost-card .price-row{
+    display:flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-top: 1px solid var(--panel-line);
+    padding-top: 12px;
+    margin-top: 4px;
+  }
+  .cost-card .price-row .plabel{ font-size: 12px; color: var(--text-dim); }
+  .cost-card .price-row .pvalue{ font-family:'IBM Plex Mono', monospace; font-size: 15px; color: var(--gold); }
+  .cost-card .price-sub{ font-size: 11px; color: var(--text-faint); margin-top: 4px; }
+
+  /* ---------- SUMMARY TABLE ---------- */
+
+  .summary{
+    margin-top: 56px;
+    border: 1px solid var(--panel-line);
+    background: var(--bg-deep);
+  }
+
+  .summary-row{
+    display:flex;
+    justify-content: space-between;
+    padding: 16px 26px;
+    border-bottom: 1px solid var(--panel-line);
+    font-size: 14px;
+  }
+  .summary-row .slabel{ color: var(--text-dim); }
+  .summary-row .svalue{ font-family:'IBM Plex Mono', monospace; color: var(--text); }
+
+  .summary-row.total{
+    padding: 20px 26px;
+    background: rgba(207,165,61,0.06);
+  }
+  .summary-row.total .slabel{ color: var(--text); font-weight: 500; font-size: 15px; }
+  .summary-row.total .svalue{ color: var(--gold); font-size: 19px; }
+
+  .summary-row.budget-check{
+    border-bottom: none;
+    background: rgba(127,174,130,0.08);
+  }
+  .summary-row.budget-check .svalue{ color: var(--green); }
+  .summary-row.budget-check.over .svalue{ color: var(--coral); }
+
+  .note{
+    margin-top: 18px;
+    font-size: 12.5px;
+    color: var(--text-faint);
+    font-weight: 300;
+    max-width: 70ch;
+    line-height: 1.6;
+  }
+  .note strong{ color: var(--text-dim); }
+
+  footer{ padding: 40px 0; text-align:center; border-top: 1px solid var(--panel-line); }
+  footer p{ font-family:'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--text-faint); }
+
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <p class="eyebrow">DAVY'S 60TH · BUDGET WORKING DOC</p>
+  <h1>Two ways to do <em>this trip</em></h1>
+  <p class="sub">Not the guest-facing site — this is the base plate for deciding what we can actually afford, built from live quotes where possible. Villa budget target: £10,000–£12,000. Your flights: £2,500 (you &amp; Davy, return).</p>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('a')">Option A — Full 2 Weeks, Villa Only</button>
+  <button class="tab-btn" onclick="showTab('b')">Option B — Hotel Week + Villa Week</button>
+</nav>
+
+<div class="wrap">
+
+  <!-- ===================== TAB A ===================== -->
+  <div id="tab-a" class="tab-panel active">
+
+    <div class="timeline">
+      <div class="tl-seg">
+        <div class="tl-label">Flight out</div>
+        <div class="tl-dates">Fri 28 Jan, PM</div>
+        <div class="tl-nights">London → Koh Samui</div>
+      </div>
+      <div class="tl-seg is-birthday">
+        <div class="tl-label">Villa — whole group</div>
+        <div class="tl-dates">Sat 29 Jan → Fri 11 Feb</div>
+        <div class="tl-nights">13 nights</div>
+        <span class="bday-flag">★ Davy's 60th, Feb 4</span>
+      </div>
+      <div class="tl-seg">
+        <div class="tl-label">Flight home</div>
+        <div class="tl-dates">Fri 11 Feb</div>
+        <div class="tl-nights">Koh Samui → London</div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Flights</h2>
+      <p>Your own return flights, London to Koh Samui (via Bangkok). Fixed figure as given.</p>
+    </div>
+    <div class="card-grid">
+      <div class="cost-card">
+        <span class="card-badge">Fixed</span>
+        <h3>Return flights</h3>
+        <div class="card-loc">London (LHR/LGW) → Koh Samui (USM), via Bangkok</div>
+        <p class="desc">You and Davy, return, economy/premium economy. Guests book their own separately — not included in this budget.</p>
+        <div class="price-row"><span class="plabel">Total</span><span class="pvalue">£2,500</span></div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Villa — 13 nights, whole group</h2>
+      <p>Two real options. Villa Aruna is a <strong>live, bookable quote</strong> for these exact dates. Villa Hin Samui is a published range only — no live quote available without a direct enquiry.</p>
+    </div>
+    <div class="card-grid">
+
+      <div class="cost-card">
+        <span class="card-badge">Live quote · recommended</span>
+        <h3><a href="https://bookings.mrpropertysiam.com/listings/258003?start=2028-01-29&end=2028-02-11&numberOfGuests=10" target="_blank" rel="noopener">Villa Aruna ↗</a></h3>
+        <div class="card-loc">5BR Seaview Estate, Chaweng Noi · Mr Property Siam · 4.60★ (6 reviews)</div>
+        <p class="desc">10 guests, 5 bed, 6 bath. Cinema room and spa on site. Hillside seaview, modern build. Free cancellation up to 14 days before arrival.</p>
+        <div class="price-row"><span class="plabel">13 nights, Jan 29 – Feb 11</span><span class="pvalue">£6,176</span></div>
+        <div class="price-sub">THB 279,118 total · THB 21,470/night avg · live quote for these exact dates</div>
+      </div>
+
+      <div class="cost-card">
+        <span class="card-badge warn">Range only, no live quote</span>
+        <h3><a href="https://www.theluxurysignature.com/property/villa-hin-koh-samui/" target="_blank" rel="noopener">Villa Hin Samui ↗</a></h3>
+        <div class="card-loc">"The Rock House", Bophut · The Luxury Signature · 5.0★ (60 reviews)</div>
+        <p class="desc">10 guests, 5 bed, 6 bath. Natural rock-formation architecture, cinema room, tennis court, 2-min walk to the beach. Enquiry-only booking, no instant pricing.</p>
+        <div class="price-row"><span class="plabel">13 nights, at published range</span><span class="pvalue">£10,921 – £21,940</span></div>
+        <div class="price-sub">$1,130–$2,270/night published range — real Feb 2028 price could land anywhere in this band</div>
+      </div>
+
+      <div class="cost-card">
+        <span class="card-badge warn">Not available for these dates</span>
+        <h3><a href="https://bookings.mrpropertysiam.com/listings/447643" target="_blank" rel="noopener">Villa Ananda Samui ↗</a></h3>
+        <div class="card-loc">"Ocean Serenity", Plai Laem · Mr Property Siam · 5.00★</div>
+        <p class="desc">10 guests, 5 bed, 5 bath. Multi-level hillside retreat, panoramic ocean and island views, contemporary design, kid-friendly, 46 amenities. Looks excellent on paper — but its calendar shows the entire Feb–Mar 2028 window blocked, so it didn't surface in the live search.</p>
+        <div class="price-row"><span class="plabel">Status</span><span class="pvalue">Blocked / unavailable</span></div>
+        <div class="price-sub">Worth a direct enquiry in case it's a placeholder block rather than a firm booking — no price could be checked while it's shown as unavailable</div>
+      </div>
+
+      <div class="cost-card">
+        <span class="card-badge warn">Not available for these dates</span>
+        <h3><a href="https://bookings.mrpropertysiam.com/listings/409565" target="_blank" rel="noopener">C Villa ↗</a></h3>
+        <div class="card-loc">Plai Laem · Mr Property Siam · 5.00★</div>
+        <p class="desc">Listed as 12 guests / 6 bed / 10 bath, but the description calls it an 8-bedroom retreat with two swimming pools plus two separate 2-bed apartments with their own kitchens — worth clarifying the real layout before relying on it. Same story as Villa Ananda: Feb–Mar 2028 is entirely blocked on the calendar, and it didn't appear in the live search either.</p>
+        <div class="price-row"><span class="plabel">Status</span><span class="pvalue">Blocked / unavailable</span></div>
+        <div class="price-sub">Bedroom/guest count is inconsistent between the listing header and description — enquire directly to confirm the real layout and dates</div>
+      </div>
+
+      <div class="cost-card">
+        <span class="card-badge">Live quote · beachfront</span>
+        <h3><a href="https://bookings.mrpropertysiam.com/listings/260406?start=2028-01-29&end=2028-02-11&numberOfGuests=8" target="_blank" rel="noopener">Villa La Playa ↗</a></h3>
+        <div class="card-loc">4BR Beachfront, Plai Laem · Mr Property Siam</div>
+        <p class="desc">8 guests only, 4 bed, 5 bath — tighter fit than Aruna for your group. But it's genuinely beachfront: 20m of private beach frontage, an 18×5m saltwater pool right on the sand, 126 listed amenities.</p>
+        <div class="price-row"><span class="plabel">13 nights, Jan 29 – Feb 11</span><span class="pvalue">£10,291</span></div>
+        <div class="price-sub">THB 465,137 (base + cleaning + card fee + VAT, excl. £332 refundable deposit) — live quote for these exact dates</div>
+      </div>
+
+    </div>
+    <p class="note">A fair note on comparing these: Villa La Playa's quote itemises a card-processing fee and cleaning fee that Villa Aruna's total didn't show — worth asking Villa Aruna directly whether those are waived, bundled in, or just not charged for a bank transfer, so you're comparing like for like.</p>
+
+    <div class="summary">
+      <div class="summary-row"><span class="slabel">Flights (you &amp; Davy)</span><span class="svalue">£2,500</span></div>
+      <div class="summary-row"><span class="slabel">Villa Aruna, 13 nights</span><span class="svalue">£6,176</span></div>
+      <div class="summary-row total"><span class="slabel">Total, Option A (Villa Aruna)</span><span class="svalue">£8,676</span></div>
+      <div class="summary-row budget-check"><span class="slabel">vs. £10K–£12K villa budget</span><span class="svalue">✓ £3,324–£5,324 to spare</span></div>
+    </div>
+    <p class="note"><strong>If you go with Villa Hin Samui instead:</strong> Flights £2,500 + Villa £10,921–£21,940 = <strong>£13,421–£24,440 total</strong> — over budget in most scenarios. Villa Aruna is the one that actually fits.</p>
+
+  </div>
+
+  <!-- ===================== TAB B ===================== -->
+  <div id="tab-b" class="tab-panel">
+
+    <div class="timeline">
+      <div class="tl-seg">
+        <div class="tl-label">Flight out</div>
+        <div class="tl-dates">Fri 28 Jan, PM</div>
+        <div class="tl-nights">London → Koh Samui</div>
+      </div>
+      <div class="tl-seg">
+        <div class="tl-label">Hotel — just you &amp; Davy</div>
+        <div class="tl-dates">Sat 29 Jan → Wed 2 Feb</div>
+        <div class="tl-nights">4 nights</div>
+      </div>
+      <div class="tl-seg is-birthday">
+        <div class="tl-label">Villa — whole group</div>
+        <div class="tl-dates">Wed 2 Feb → Fri 11 Feb</div>
+        <div class="tl-nights">9 nights</div>
+        <span class="bday-flag">★ Davy's 60th, Feb 4</span>
+      </div>
+      <div class="tl-seg">
+        <div class="tl-label">Flight home</div>
+        <div class="tl-dates">Fri 11 Feb</div>
+        <div class="tl-nights">Koh Samui → London</div>
+      </div>
+    </div>
+
+    <p class="note" style="margin-bottom:40px;">This isn't an even 7-and-7 split. Keeping the flight-out date fixed at 28/29 Jan <strong>and</strong> making sure the villa check-in lands before Davy's birthday only leaves room for 4 nights of hotel first. A true 7+7 split would need the flight out moved to around 25/26 Jan instead — say the word if you'd rather do that.</p>
+
+    <div class="section-head">
+      <h2>Flights</h2>
+      <p>Same as Option A — same trip length, same dates.</p>
+    </div>
+    <div class="card-grid">
+      <div class="cost-card">
+        <span class="card-badge">Fixed</span>
+        <h3>Return flights</h3>
+        <div class="card-loc">London (LHR/LGW) → Koh Samui (USM), via Bangkok</div>
+        <p class="desc">You and Davy, return. Guests book their own separately — not included in this budget.</p>
+        <div class="price-row"><span class="plabel">Total</span><span class="pvalue">£2,500</span></div>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Hotel — 4 nights, just the two of you</h2>
+      <p>Three tiers, all well short of "over the top." Pick the level of pampering you want before the group arrives.</p>
+    </div>
+    <div class="card-grid">
+
+      <div class="cost-card">
+        <span class="card-badge">Budget</span>
+        <h3>OZO Chaweng Samui</h3>
+        <div class="card-loc">4-star, beachfront, Chaweng · 8.8/10 rated</div>
+        <p class="desc">Stylish, direct beach access, romance packages available. The cheapest of the three by a distance.</p>
+        <div class="price-row"><span class="plabel">4 nights</span><span class="pvalue">£268 – £327</span></div>
+        <div class="price-sub">$90–$110/night</div>
+      </div>
+
+      <div class="cost-card">
+        <span class="card-badge">Recommended</span>
+        <h3>Nora Buri Resort &amp; Spa</h3>
+        <div class="card-loc">5-star, hillside seaview, near Chaweng · full-service spa</div>
+        <p class="desc">Genuine 5-star for well under the price of one — private beach, spa, two pools. Best value-to-quality of the three.</p>
+        <div class="price-row"><span class="plabel">4 nights</span><span class="pvalue">£476 – £744</span></div>
+        <div class="price-sub">$160–$250/night</div>
+      </div>
+
+      <div class="cost-card">
+        <span class="card-badge">Boutique</span>
+        <h3>Marasca Samui</h3>
+        <div class="card-loc">Boutique, Small Luxury Hotels of the World, Bophut · 9.6/10 rated</div>
+        <p class="desc">The most intimate and highest-rated of the three. Smaller property, romantic, top guest reviews.</p>
+        <div class="price-row"><span class="plabel">4 nights</span><span class="pvalue">£672 – £744</span></div>
+        <div class="price-sub">$226–$250/night</div>
+      </div>
+
+    </div>
+
+    <div class="section-head">
+      <h2>Villa — 9 nights, whole group</h2>
+      <p>Same live quote as Option A, just for the shorter 9-night window.</p>
+    </div>
+    <div class="card-grid">
+      <div class="cost-card">
+        <span class="card-badge">Live quote</span>
+        <h3><a href="https://bookings.mrpropertysiam.com/listings/258003?start=2028-02-02&end=2028-02-11&numberOfGuests=10" target="_blank" rel="noopener">Villa Aruna ↗</a></h3>
+        <div class="card-loc">5BR Seaview Estate, Chaweng Noi · Mr Property Siam · 4.60★ (6 reviews)</div>
+        <p class="desc">10 guests, cinema room and spa on site. Check-in lands 2 days before Davy's birthday.</p>
+        <div class="price-row"><span class="plabel">9 nights, Feb 2 – Feb 11</span><span class="pvalue">£4,300</span></div>
+        <div class="price-sub">THB 194,374 total · live quote for these exact dates</div>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-row"><span class="slabel">Flights (you &amp; Davy)</span><span class="svalue">£2,500</span></div>
+      <div class="summary-row"><span class="slabel">Hotel, 4 nights (OZO – Marasca range)</span><span class="svalue">£268 – £744</span></div>
+      <div class="summary-row"><span class="slabel">Villa Aruna, 9 nights</span><span class="svalue">£4,300</span></div>
+      <div class="summary-row total"><span class="slabel">Total, Option B</span><span class="svalue">£7,068 – £7,544</span></div>
+      <div class="summary-row budget-check"><span class="slabel">vs. £10K–£12K villa budget</span><span class="svalue">✓ £4,456–£4,932 to spare</span></div>
+    </div>
+    <p class="note">Note: the budget-check line compares against your villa-only budget target, since that's the figure you gave — this total also happens to fold in flights and the hotel week, and still comes in under it.</p>
+
+  </div>
+
+</div>
+
+<footer>
+  <p>WORKING DOCUMENT · NOT FOR GUESTS · UPDATE BEFORE SHARING</p>
+</footer>
+
+<script>
+  function showTab(which){
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + which).classList.add('active');
+    document.querySelectorAll('.tab-btn')[which === 'a' ? 0 : 1].classList.add('active');
+  }
+</script>
+
+</body>
+</html>
