@@ -763,6 +763,76 @@
   }
   .driver-details p.mono{ font-size: 12px; color: var(--text-faint); }
 
+  /* ---------- IN THE VILLA ---------- */
+
+  .villa-rules{ background: var(--bg); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .quickfacts-grid{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+    margin-bottom: 40px;
+  }
+  @media(max-width: 720px){ .quickfacts-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  .quickfact{
+    background: var(--panel);
+    padding: 22px 20px;
+    text-align:center;
+  }
+  .quickfact .qf-value{ font-family:'IBM Plex Mono', monospace; font-size: 19px; color: var(--gold); display:block; margin-bottom: 6px; }
+  .quickfact .qf-label{ font-size: 12px; color: var(--text-dim); font-weight: 300; }
+
+  .rules-note{
+    font-size: 14px;
+    color: var(--text-dim);
+    font-weight: 300;
+    max-width: 70ch;
+    margin: 0 0 40px;
+    padding: 18px 22px;
+    background: var(--panel);
+    border-left: 2px solid var(--gold);
+  }
+  .rules-note strong{ color: var(--text); font-weight: 500; }
+
+  .rules-tags{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 48px;
+  }
+  .rule-tag{
+    font-size: 13px;
+    color: var(--text-dim);
+    font-weight: 300;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    padding: 8px 14px;
+    border-radius: 20px;
+  }
+  .rule-tag strong{ color: var(--gold); font-weight: 500; }
+
+  .amenity-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+  }
+
+  .amenity-card{ background: var(--panel); padding: 22px 22px; }
+  .amenity-card h4{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--coral);
+    margin: 0 0 12px;
+  }
+  .amenity-card p{ font-size: 13.5px; color: var(--text-dim); font-weight: 300; line-height: 1.7; margin: 0; }
+
   /* ---------- TRAVEL INFO ---------- */
 
   .travel-info{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
@@ -880,6 +950,7 @@
     <button class="nav-close" onclick="toggleNav()">&times;</button>
     <a href="#top" onclick="toggleNav()" data-i18n="nav.home"></a>
     <a href="#villa-section" onclick="toggleNav()" data-i18n="nav.villa"></a>
+    <a href="#villa-rules-section" onclick="toggleNav()" data-i18n="nav.rules"></a>
     <a href="#map-section" onclick="toggleNav()" data-i18n="nav.map"></a>
     <a href="#itinerary-section" onclick="toggleNav()" data-i18n="nav.itinerary"></a>
     <a href="#weather-section" onclick="toggleNav()" data-i18n="nav.weather"></a>
@@ -907,6 +978,10 @@
         <a class="tile" href="#villa-section">
           <svg viewBox="0 0 32 32" fill="none"><path d="M5 16L16 7l11 9" stroke="currentColor" stroke-width="1.6"/><rect x="8" y="16" width="16" height="10" stroke="currentColor" stroke-width="1.6"/></svg>
           <span data-i18n="nav.villa"></span>
+        </a>
+        <a class="tile" href="#villa-rules-section">
+          <svg viewBox="0 0 32 32" fill="none"><rect x="6" y="4" width="20" height="24" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M11 11h10M11 16h10M11 21h6" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.rules"></span>
         </a>
         <a class="tile" href="#map-section">
           <svg viewBox="0 0 32 32" fill="none"><path d="M16 5c-4 0-7 3-7 7 0 5 7 15 7 15s7-10 7-15c0-4-3-7-7-7z" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="12" r="2.5" stroke="currentColor" stroke-width="1.6"/></svg>
@@ -959,6 +1034,29 @@
         </div>
         <div class="carousel-thumbs" id="carousel-thumbs"></div>
       </div>
+    </div>
+  </section>
+
+  <section class="villa-rules" id="villa-rules-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="rules.eyebrow"></p>
+        <h2 data-i18n="rules.title"></h2>
+        <p data-i18n="rules.sub"></p>
+      </div>
+
+      <div class="quickfacts-grid">
+        <div class="quickfact"><span class="qf-value">15:00</span><span class="qf-label" data-i18n="rules.checkin"></span></div>
+        <div class="quickfact"><span class="qf-value">11:00</span><span class="qf-label" data-i18n="rules.checkout"></span></div>
+        <div class="quickfact"><span class="qf-value">12</span><span class="qf-label" data-i18n="rules.maxguests"></span></div>
+        <div class="quickfact"><span class="qf-value mono" style="font-size:14px;" data-i18n="rules.selfcheckin.val"></span><span class="qf-label" data-i18n="rules.selfcheckin.label"></span></div>
+      </div>
+
+      <p class="rules-note" data-i18n-html="rules.smoking"></p>
+
+      <div class="rules-tags" id="rules-tags"></div>
+
+      <div class="amenity-grid" id="amenity-grid"></div>
     </div>
   </section>
 
@@ -1054,37 +1152,34 @@
         <p data-i18n="travel.sub"></p>
       </div>
 
-      <div class="travel-grid">
-        <div class="travel-col">
-          <ul id="travel-list"></ul>
-        </div>
-        <div class="plug-card">
-          <svg viewBox="0 0 260 140" width="220" height="120">
-            <!-- UK plug (Type G) -->
-            <g>
-              <rect x="8" y="42" width="52" height="56" rx="6" fill="none" stroke="var(--text-dim)" stroke-width="2"/>
-              <rect x="28" y="30" width="8" height="16" fill="var(--text-dim)"/>
-              <rect x="14" y="30" width="8" height="16" fill="var(--text-dim)"/>
-              <rect x="42" y="30" width="8" height="16" fill="var(--text-dim)"/>
-              <text x="34" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--text-faint)">UK</text>
-            </g>
-            <!-- cross-out -->
-            <g stroke="var(--coral)" stroke-width="3" stroke-linecap="round">
-              <line x1="95" y1="50" x2="125" y2="80"/>
-              <line x1="125" y1="50" x2="95" y2="80"/>
-            </g>
-            <!-- Thai socket -->
-            <g>
-              <rect x="160" y="30" width="92" height="68" rx="10" fill="none" stroke="var(--gold)" stroke-width="2"/>
-              <rect x="192" y="48" width="6" height="20" rx="2" fill="var(--gold)"/>
-              <rect x="212" y="48" width="6" height="20" rx="2" fill="var(--gold)"/>
-              <circle cx="206" cy="82" r="4" fill="var(--gold)"/>
-              <text x="206" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--gold)">THAILAND</text>
-            </g>
-          </svg>
-          <p class="plug-label mono" data-i18n="travel.plug.label"></p>
-          <p class="plug-note" data-i18n="travel.plug.note"></p>
-        </div>
+      <div class="travel-card-grid" id="travel-card-grid"></div>
+
+      <div class="plug-card">
+        <svg viewBox="0 0 260 140" width="220" height="120">
+          <!-- UK plug (Type G) -->
+          <g>
+            <rect x="8" y="42" width="52" height="56" rx="6" fill="none" stroke="var(--text-dim)" stroke-width="2"/>
+            <rect x="28" y="30" width="8" height="16" fill="var(--text-dim)"/>
+            <rect x="14" y="30" width="8" height="16" fill="var(--text-dim)"/>
+            <rect x="42" y="30" width="8" height="16" fill="var(--text-dim)"/>
+            <text x="34" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--text-faint)">UK</text>
+          </g>
+          <!-- cross-out -->
+          <g stroke="var(--coral)" stroke-width="3" stroke-linecap="round">
+            <line x1="95" y1="50" x2="125" y2="80"/>
+            <line x1="125" y1="50" x2="95" y2="80"/>
+          </g>
+          <!-- Thai socket -->
+          <g>
+            <rect x="160" y="30" width="92" height="68" rx="10" fill="none" stroke="var(--gold)" stroke-width="2"/>
+            <rect x="192" y="48" width="6" height="20" rx="2" fill="var(--gold)"/>
+            <rect x="212" y="48" width="6" height="20" rx="2" fill="var(--gold)"/>
+            <circle cx="206" cy="82" r="4" fill="var(--gold)"/>
+            <text x="206" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--gold)">THAILAND</text>
+          </g>
+        </svg>
+        <p class="plug-label mono" data-i18n="travel.plug.label"></p>
+        <p class="plug-note" data-i18n="travel.plug.note"></p>
       </div>
 
       <p class="mono" style="margin-top:24px; font-size:11px; color:var(--text-faint);" data-i18n="travel.disclaimer"></p>
@@ -1366,6 +1461,7 @@
       "packing.babies.title": "Baby & toddler essentials",
       "nav.home": "Home",
       "nav.villa": "The Villa",
+      "nav.rules": "In the Villa",
       "nav.map": "Map",
       "nav.itinerary": "Itinerary",
       "nav.weather": "Weather",
@@ -1373,6 +1469,15 @@
       "nav.travelinfo": "Before You Travel",
       "nav.arrival": "Arrival Info",
       "travel.eyebrow": "PLANNING AHEAD",
+      "rules.eyebrow": "THE PRACTICAL STUFF",
+      "rules.title": "In the villa",
+      "rules.sub": "Everything about staying at Villa Anushka — timings, house rules, and what's on hand.",
+      "rules.checkin": "Check-in (after)",
+      "rules.checkout": "Check-out (before)",
+      "rules.maxguests": "Maximum guests",
+      "rules.selfcheckin.val": "Self check-in",
+      "rules.selfcheckin.label": "With building staff",
+      "rules.smoking": "<strong>Smoking isn't permitted inside the rooms</strong>, but it is permitted outside.",
       "travel.title": "What to expect before travelling",
       "travel.sub": "A quick checklist to sort out before you fly — nothing urgent, just worth doing early.",
       "travel.plug.label": "PLUG TYPE",
@@ -1437,6 +1542,7 @@
       "packing.babies.title": "Essentiels bébé & enfant en bas âge",
       "nav.home": "Accueil",
       "nav.villa": "La Villa",
+      "nav.rules": "Dans la villa",
       "nav.map": "Carte",
       "nav.itinerary": "Programme",
       "nav.weather": "Météo",
@@ -1444,6 +1550,15 @@
       "nav.travelinfo": "Avant de partir",
       "nav.arrival": "Infos d'arrivée",
       "travel.eyebrow": "SE PRÉPARER",
+      "rules.eyebrow": "LES DÉTAILS PRATIQUES",
+      "rules.title": "Dans la villa",
+      "rules.sub": "Tout sur le séjour à la Villa Anushka — horaires, règles de la maison, et ce qui est à disposition.",
+      "rules.checkin": "Arrivée (après)",
+      "rules.checkout": "Départ (avant)",
+      "rules.maxguests": "Nombre maximum d'invités",
+      "rules.selfcheckin.val": "Enregistrement autonome",
+      "rules.selfcheckin.label": "Avec le personnel du bâtiment",
+      "rules.smoking": "<strong>Il est interdit de fumer à l'intérieur des chambres</strong>, mais c'est autorisé à l'extérieur.",
       "travel.title": "À quoi s'attendre avant de partir",
       "travel.sub": "Une petite liste à régler avant le vol — rien d'urgent, mais mieux vaut s'y prendre tôt.",
       "travel.plug.label": "TYPE DE PRISE",
@@ -1558,30 +1673,94 @@
 
   const TRAVEL_INFO = {
     en: [
-      "Valid passport with <strong>at least 6 months</strong> validity remaining from your travel date",
-      "UK passport holders don't currently need a visa for a short tourist stay — worth double-checking closer to the date, as Thailand has approved shortening the visa-free window and the exact rules may have changed by 2028",
-      "Immigration can occasionally ask for proof of funds — roughly <strong>10,000 THB per person</strong> (or 20,000 THB per family) — rarely checked, but good to have",
-      "Get some Thai Baht converted before you travel, or plan to withdraw on arrival",
-      "Take out <strong>travel insurance</strong> that covers medical emergencies",
-      "If your phone is unlocked, a local eSIM is easy and cheap — around €10 for 10GB. Otherwise, check with your carrier about a Thailand roaming add-on",
-      "The villa has <strong>WiFi</strong> available",
-      "Pack any medication you might need — ibuprofen, paracetamol, mosquito repellent, and sun cream"
+      {icon:"passport", title:"Passport validity", desc:"Valid passport with at least 6 months remaining from your travel date."},
+      {icon:"visa", title:"Visa", desc:"UK passport holders don't currently need one for a short stay — worth double-checking closer to the date, since the visa-free window is being shortened and rules may change by 2028."},
+      {icon:"cash", title:"Proof of funds", desc:"Immigration can occasionally ask to see roughly 10,000 THB per person (or 20,000 THB per family). Rarely checked, but good to have."},
+      {icon:"exchange", title:"Currency", desc:"Get some Thai Baht converted before you travel, or plan to withdraw on arrival."},
+      {icon:"insurance", title:"Travel insurance", desc:"Take out cover that includes medical emergencies."},
+      {icon:"sim", title:"Phone & data", desc:"Unlocked phone? A local eSIM is easy and cheap — around €10 for 10GB. Otherwise check with your carrier about a Thailand add-on."},
+      {icon:"wifi", title:"Wifi", desc:"The villa has WiFi available throughout."},
+      {icon:"medkit", title:"Medication", desc:"Pack anything you might need — ibuprofen, paracetamol, mosquito repellent, and sun cream."}
     ],
     fr: [
-      "Passeport valide avec <strong>au moins 6 mois</strong> de validité restante à partir de la date de voyage",
-      "Les titulaires d'un passeport britannique n'ont actuellement pas besoin de visa pour un court séjour touristique — à vérifier plus près de la date, car la Thaïlande a approuvé une réduction de cette période et les règles exactes pourraient avoir changé d'ici 2028",
-      "L'immigration peut occasionnellement demander une preuve de fonds — environ <strong>10 000 THB par personne</strong> (ou 20 000 THB par famille) — rarement vérifié, mais bon à avoir",
-      "Faites convertir des bahts thaïlandais avant de partir, ou prévoyez un retrait à l'arrivée",
-      "Souscrivez une <strong>assurance voyage</strong> couvrant les urgences médicales",
-      "Si votre téléphone est débloqué, une eSIM locale est simple et peu coûteuse — environ 10€ pour 10 Go. Sinon, vérifiez auprès de votre opérateur les options d'itinérance en Thaïlande",
-      "La villa dispose du <strong>WiFi</strong>",
-      "Emportez les médicaments dont vous pourriez avoir besoin — ibuprofène, paracétamol, répulsif anti-moustiques et crème solaire"
+      {icon:"passport", title:"Validité du passeport", desc:"Passeport valide avec au moins 6 mois de validité restante à partir de la date de voyage."},
+      {icon:"visa", title:"Visa", desc:"Les titulaires d'un passeport britannique n'ont actuellement pas besoin de visa pour un court séjour — à vérifier plus près de la date, car cette période sans visa est réduite et les règles pourraient changer d'ici 2028."},
+      {icon:"cash", title:"Preuve de fonds", desc:"L'immigration peut parfois demander environ 10 000 THB par personne (ou 20 000 THB par famille). Rarement vérifié, mais bon à avoir."},
+      {icon:"exchange", title:"Devise", desc:"Faites convertir des bahts thaïlandais avant de partir, ou prévoyez un retrait à l'arrivée."},
+      {icon:"insurance", title:"Assurance voyage", desc:"Souscrivez une assurance couvrant les urgences médicales."},
+      {icon:"sim", title:"Téléphone & données", desc:"Téléphone débloqué ? Une eSIM locale est simple et peu coûteuse — environ 10€ pour 10 Go. Sinon, vérifiez les options d'itinérance auprès de votre opérateur."},
+      {icon:"wifi", title:"Wifi", desc:"La villa dispose du WiFi partout."},
+      {icon:"medkit", title:"Médicaments", desc:"Emportez ce dont vous pourriez avoir besoin — ibuprofène, paracétamol, répulsif anti-moustiques et crème solaire."}
     ]
   };
 
+  const TRAVEL_ICONS = {
+    passport: '<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8"/>',
+    visa: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/>',
+    cash: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>',
+    exchange: '<path d="M7 7h11l-3-3M17 17H6l3 3"/>',
+    insurance: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+    sim: '<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+    wifi: '<path d="M4 9a14 14 0 0 1 16 0M7 12.5a9 9 0 0 1 10 0M10.5 16a4 4 0 0 1 3 0"/><circle cx="12" cy="19" r="0.8" fill="currentColor"/>',
+    medkit: '<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M12 10v6M9 13h6"/>'
+  };
+
+  const RULE_TAGS = {
+    en: ["Commercial photography allowed", "Smoking allowed (outside only)", "Pets allowed — assistance animals always welcome", "Breakfast provided", "Long-term stays allowed (28+ days)", "Cleaning available during stay"],
+    fr: ["Photographie commerciale autorisée", "Fumeurs autorisés (extérieur uniquement)", "Animaux acceptés — animaux d'assistance toujours bienvenus", "Petit-déjeuner inclus", "Séjours longue durée acceptés (28 jours et plus)", "Ménage disponible pendant le séjour"]
+  };
+
+  const AMENITIES = {
+    en: [
+      {cat:"Scenic Views", items:"Beach view, ocean view, pool view, sea view"},
+      {cat:"Bathroom", items:"Bath, hairdryer, cleaning products, shampoo, body soap, outdoor shower, hot water, shower gel"},
+      {cat:"Bedroom & Laundry", items:"Washing machine, towels & bed sheets, hangers, extra pillows & blankets, room-darkening blinds, iron, clothes drying rack, safe, wardrobe"},
+      {cat:"Entertainment", items:"TV, sound system, exercise equipment, pool table, cinema room"},
+      {cat:"Family", items:"Cot, high chair, board games, babysitter recommendations"},
+      {cat:"Heating & Cooling", items:"Air conditioning, ceiling fans"},
+      {cat:"Home Safety", items:"Fire extinguisher, first aid kit"},
+      {cat:"Internet & Office", items:"WiFi throughout, dedicated workspace in a room with a door"},
+      {cat:"Kitchen & Dining", items:"Full kitchen, fridge, freezer, microwave, dishwasher, cooker, oven, kettle, coffee maker, toaster, blender, rice cooker, BBQ utensils, dining table, cooking basics, crockery & cutlery, wine glasses, coffee"},
+      {cat:"Location", items:"Private entrance"},
+      {cat:"Outdoor", items:"Private patio or balcony, back garden, outdoor furniture, outdoor dining area, sun loungers"},
+      {cat:"Parking & Pool", items:"Free parking on premises, private infinity pool (open 24 hours, all year)"},
+      {cat:"Services", items:"Self check-in, building staff on hand 24 hours, cleaning available during stay"}
+    ],
+    fr: [
+      {cat:"Vues", items:"Vue sur la plage, vue sur l'océan, vue sur la piscine, vue sur la mer"},
+      {cat:"Salle de bain", items:"Baignoire, sèche-cheveux, produits d'entretien, shampooing, savon, douche extérieure, eau chaude, gel douche"},
+      {cat:"Chambre et linge", items:"Lave-linge, serviettes et draps, cintres, oreillers et couvertures supplémentaires, rideaux occultants, fer à repasser, étendoir à linge, coffre-fort, penderie"},
+      {cat:"Divertissement", items:"TV, système audio, équipement de fitness, billard, salle de cinéma"},
+      {cat:"Famille", items:"Lit bébé, chaise haute, jeux de société, recommandations de baby-sitter"},
+      {cat:"Chauffage et climatisation", items:"Climatisation, ventilateurs de plafond"},
+      {cat:"Sécurité", items:"Extincteur, trousse de premiers secours"},
+      {cat:"Internet et bureau", items:"WiFi partout, espace de travail dédié dans une pièce avec porte"},
+      {cat:"Cuisine et repas", items:"Cuisine complète, réfrigérateur, congélateur, micro-ondes, lave-vaisselle, cuisinière, four, bouilloire, cafetière, grille-pain, blender, cuiseur à riz, ustensiles de barbecue, table à manger, ustensiles de base, vaisselle et couverts, verres à vin, café"},
+      {cat:"Emplacement", items:"Entrée privée"},
+      {cat:"Extérieur", items:"Patio ou balcon privé, jardin, mobilier extérieur, coin repas extérieur, transats"},
+      {cat:"Parking et piscine", items:"Parking gratuit sur place, piscine à débordement privée (ouverte 24h/24, toute l'année)"},
+      {cat:"Services", items:"Enregistrement autonome, personnel sur place 24h/24, ménage disponible pendant le séjour"}
+    ]
+  };
+
+  function renderRules(lang){
+    const tagsEl = document.getElementById('rules-tags');
+    tagsEl.innerHTML = RULE_TAGS[lang].map(t => `<span class="rule-tag">${t}</span>`).join('');
+
+    const grid = document.getElementById('amenity-grid');
+    grid.innerHTML = AMENITIES[lang].map(a => `
+      <div class="amenity-card"><h4>${a.cat}</h4><p>${a.items}</p></div>
+    `).join('');
+  }
+
   function renderTravelInfo(lang){
-    const ul = document.getElementById('travel-list');
-    ul.innerHTML = TRAVEL_INFO[lang].map(i => `<li>${i}</li>`).join('');
+    const grid = document.getElementById('travel-card-grid');
+    grid.innerHTML = TRAVEL_INFO[lang].map(item => `
+      <div class="travel-card">
+        <span class="t-icon"><svg viewBox="0 0 24 24" stroke="var(--gold)" stroke-width="1.6" fill="none">${TRAVEL_ICONS[item.icon]}</svg></span>
+        <div class="t-body"><h4>${item.title}</h4><p>${item.desc}</p></div>
+      </div>
+    `).join('');
   }
 
   let currentLang = 'en';
@@ -1627,6 +1806,7 @@
     renderItinerary(lang);
     renderPacking(lang);
     renderTravelInfo(lang);
+    renderRules(lang);
     updateMailtoLink(lang);
   }
 
