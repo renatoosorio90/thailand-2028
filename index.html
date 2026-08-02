@@ -76,6 +76,14 @@
     padding: 24px;
   }
 
+  .gate-lang{
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    display:flex;
+    gap: 6px;
+  }
+
   .gate-box{
     max-width: 400px;
     width: 100%;
@@ -262,28 +270,18 @@
     padding: 60px 28px 100px;
     overflow: hidden;
     background:
-      radial-gradient(ellipse at 62% 42%, rgba(255,150,90,0.35) 0%, transparent 50%),
-      linear-gradient(180deg, #2b1d3d 0%, #5c2a3f 30%, #a8492f 55%, #d97a3a 72%, #e8a24a 100%);
+      radial-gradient(ellipse at 50% 100%, rgba(255,140,80,0.55) 0%, transparent 55%),
+      linear-gradient(180deg, #140b1c 0%, #2c1526 28%, #5a1f2c 55%, #8a3325 78%, #b8551f 100%);
   }
 
   .hero-haze{
     position:absolute; inset:0;
     background:
-      radial-gradient(circle at 62% 46%, rgba(255,224,170,0.45) 0%, transparent 40%),
-      linear-gradient(180deg, transparent 55%, rgba(20,10,25,0.25) 100%);
-    opacity: 1;
+      radial-gradient(ellipse at 50% 105%, rgba(255,200,140,0.35) 0%, transparent 45%),
+      linear-gradient(180deg, rgba(10,5,15,0.35) 0%, transparent 30%);
   }
 
-  .hero-sun{
-    position:absolute;
-    top: 40%;
-    left: 62%;
-    transform: translate(-50%,-50%);
-    width: 130px; height: 130px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 42% 38%, #fff3d6, #ffb15e 45%, #e8703c 80%);
-    box-shadow: 0 0 120px 40px rgba(255,150,80,0.4), 0 0 50px 12px rgba(255,210,150,0.55);
-  }
+  .hero-sun{ display: none; }
 
   .hero-tide{
     position: absolute;
@@ -310,6 +308,7 @@
     line-height: 1.08;
     max-width: 16ch;
     font-weight: 400;
+    text-shadow: 0 2px 24px rgba(0,0,0,0.55);
   }
   .hero h1 em{ font-style: italic; color: var(--gold); }
 
@@ -318,20 +317,22 @@
     z-index: 2;
     margin-top: 26px;
     font-size: 15px;
-    color: var(--text-dim);
+    color: var(--text);
     font-family: 'IBM Plex Mono', monospace;
     letter-spacing: 0.06em;
+    text-shadow: 0 1px 12px rgba(0,0,0,0.6);
   }
-  .hero .dates span{ color: var(--coral); }
+  .hero .dates span{ color: #ffb98a; }
 
   .hero .sub{
     position: relative;
     z-index: 2;
     max-width: 46ch;
     margin: 22px auto 0;
-    color: var(--text-dim);
+    color: rgba(243,238,226,0.85);
     font-size: 16px;
     font-weight: 300;
+    text-shadow: 0 1px 14px rgba(0,0,0,0.55);
   }
 
   /* ---------- SECTION SHARED ---------- */
@@ -841,12 +842,16 @@
 
 <!-- ============ PASSWORD GATE ============ -->
 <div id="gate">
+  <div class="gate-lang">
+    <button class="lang-btn active" id="gate-lang-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="gate-lang-fr" onclick="setLang('fr')">FR</button>
+  </div>
   <div class="gate-box">
-    <p class="eyebrow">PRIVATE INVITATION</p>
-    <h1>You're invited to <em>Davy's 60th</em></h1>
-    <p class="hint">Enter the password to open your invitation.</p>
+    <p class="eyebrow" data-i18n="gate.eyebrow">PRIVATE INVITATION</p>
+    <h1 data-i18n-html="gate.title">You're invited to <em>Davy's 60th</em></h1>
+    <p class="hint" data-i18n="gate.hint">Enter the password to open your invitation.</p>
     <input type="password" id="gate-input" placeholder="Password" autocomplete="off">
-    <button id="gate-submit">Unlock</button>
+    <button id="gate-submit" data-i18n="gate.button">Unlock</button>
     <div id="gate-error"></div>
   </div>
 </div>
@@ -880,8 +885,8 @@
     <div class="hero-haze"></div>
     <div class="hero-sun"></div>
     <svg class="hero-tide" viewBox="0 0 1440 180" preserveAspectRatio="none">
-      <path fill="#7a3a3f" fill-opacity="0.85" d="M0,90 C240,140 480,50 720,80 C960,110 1200,50 1440,90 L1440,180 L0,180 Z"></path>
-      <path fill="#3a1f30" d="M0,120 C260,80 500,150 740,120 C980,90 1220,150 1440,120 L1440,180 L0,180 Z"></path>
+      <path fill="#5e2418" fill-opacity="0.9" d="M0,90 C240,140 480,50 720,80 C960,110 1200,50 1440,90 L1440,180 L0,180 Z"></path>
+      <path fill="#241018" d="M0,120 C260,80 500,150 740,120 C980,90 1220,150 1440,120 L1440,180 L0,180 Z"></path>
     </svg>
     <p class="eyebrow" data-i18n="hero.eyebrow"></p>
     <h1 data-i18n-html="hero.title"></h1>
@@ -1147,7 +1152,7 @@
       return {
         x: Math.random() * w,
         y: Math.random() * h,
-        r: 1.4 + Math.random() * 2.6,
+        r: 1.8 + Math.random() * 3.2,
         speed: 0.12 + Math.random() * 0.28,
         drift: (Math.random() - 0.5) * 0.25,
         alpha: 0.55 + Math.random() * 0.4,
@@ -1162,12 +1167,27 @@
     function drawStar(p, alpha){
       ctx.save();
       ctx.globalAlpha = alpha;
-      ctx.shadowBlur = p.r * 5;
+      ctx.translate(p.x, p.y);
+      ctx.shadowBlur = p.r * 6;
       ctx.shadowColor = p.color;
       ctx.fillStyle = p.color;
+
+      const spike = p.r * 4.2;
+      // 4-point sparkle flare
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.moveTo(0, -spike);
+      ctx.quadraticCurveTo(p.r * 0.5, -p.r * 0.5, spike, 0);
+      ctx.quadraticCurveTo(p.r * 0.5, p.r * 0.5, 0, spike);
+      ctx.quadraticCurveTo(-p.r * 0.5, p.r * 0.5, -spike, 0);
+      ctx.quadraticCurveTo(-p.r * 0.5, -p.r * 0.5, 0, -spike);
+      ctx.closePath();
       ctx.fill();
+
+      // bright core
+      ctx.beginPath();
+      ctx.arc(0, 0, p.r * 0.9, 0, Math.PI * 2);
+      ctx.fill();
+
       ctx.restore();
     }
 
@@ -1301,6 +1321,10 @@
   const T = {
     en: {
       "hero.eyebrow": "YOU'RE INVITED",
+      "gate.eyebrow": "PRIVATE INVITATION",
+      "gate.title": "You're invited to <em>Davy's 60th</em>",
+      "gate.hint": "Enter the password to open your invitation.",
+      "gate.button": "Unlock",
       "hero.title": "Davy's turning <em>60</em>, in Thailand",
       "hero.dates": "KOH SAMUI · <span style='color:var(--coral)'>29 JANUARY &ndash; 11 FEBRUARY 2028</span>",
       "hero.sub": "Two weeks together on the island, one big birthday in the middle of it. Have a look around and get ready.",
@@ -1368,6 +1392,10 @@
     },
     fr: {
       "hero.eyebrow": "VOUS ÊTES INVITÉS",
+      "gate.eyebrow": "INVITATION PRIVÉE",
+      "gate.title": "Vous êtes invités aux <em>60 ans de Davy</em>",
+      "gate.hint": "Entrez le mot de passe pour ouvrir votre invitation.",
+      "gate.button": "Déverrouiller",
       "hero.title": "Davy fête ses <em>60 ans</em>, en Thaïlande",
       "hero.dates": "KOH SAMUI · <span style='color:var(--coral)'>DU 29 JANVIER AU 11 FÉVRIER 2028</span>",
       "hero.sub": "Deux semaines ensemble sur l'île, avec un grand anniversaire au milieu. Jetez un œil et préparez-vous.",
@@ -1577,6 +1605,8 @@
     document.documentElement.lang = lang;
     document.getElementById('lang-en').classList.toggle('active', lang === 'en');
     document.getElementById('lang-fr').classList.toggle('active', lang === 'fr');
+    document.getElementById('gate-lang-en').classList.toggle('active', lang === 'en');
+    document.getElementById('gate-lang-fr').classList.toggle('active', lang === 'fr');
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
