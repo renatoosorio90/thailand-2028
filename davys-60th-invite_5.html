@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're Invited — Davy's 60th, Thailand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --bg: #0a1e21;
+    --bg-deep: #061618;
+    --panel: #102c2f;
+    --panel-line: rgba(243,238,226,0.10);
+    --gold: #cfa53d;
+    --coral: #e4694a;
+    --text: #f3eee2;
+    --text-dim: #9db0ac;
+    --text-faint: #6d8480;
+    --max: 1080px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,h2,h3{ font-family: 'Fraunces', serif; font-weight: 500; margin: 0; }
+  .mono{ font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.03em; }
+  .wrap{ max-width: var(--max); margin: 0 auto; padding: 0 28px; }
+  ::selection{ background: var(--gold); color: var(--bg-deep); }
+  button{ font-family: inherit; }
+
+  #bg-canvas{
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  #fw-canvas{
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .4s ease;
+    mix-blend-mode: screen;
+  }
+  #fw-canvas.active{ opacity: 1; }
+
+  #gate, #site{ position: relative; z-index: 1; }
+
+  /* ============ PASSWORD GATE ============ */
+
+  #gate{
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(ellipse at 50% 20%, #163a3e 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 70%);
+    padding: 24px;
+  }
+
+  .gate-box{
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .gate-box .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+
+  .gate-box h1{
+    font-size: clamp(26px, 5vw, 34px);
+    font-weight: 400;
+    margin-bottom: 12px;
+  }
+  .gate-box h1 em{ color: var(--gold); font-style: italic; }
+
+  .gate-box p.hint{
+    font-size: 13.5px;
+    color: var(--text-dim);
+    font-weight: 300;
+    margin-bottom: 30px;
+  }
+
+  #gate-input{
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    padding: 14px 16px;
+    border-radius: 4px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+  #gate-input:focus{ border-color: var(--gold); }
+
+  #gate-submit{
+    width: 100%;
+    margin-top: 14px;
+    background: var(--gold);
+    color: var(--bg-deep);
+    border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 14px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity .15s ease;
+  }
+  #gate-submit:hover{ opacity: 0.88; }
+
+  #gate-error{
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: var(--coral);
+    font-family: 'IBM Plex Mono', monospace;
+    min-height: 16px;
+  }
+
+  /* ============ SITE (hidden until unlocked) ============ */
+
+  #site{ display:none; }
+  #site.unlocked{ display:block; }
+
+  /* ---------- TOP BAR ---------- */
+
+  .topbar{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    gap: 6px;
+    padding: 16px 28px;
+    background: rgba(6,22,24,0.85);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--panel-line);
+  }
+
+  .lang-group{ display:flex; gap: 6px; }
+
+  .lang-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    background: none;
+    border: 1px solid var(--panel-line);
+    color: var(--text-faint);
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .lang-btn.active{ color: var(--gold); border-color: var(--gold); }
+  .lang-btn:hover{ color: var(--text); }
+
+  /* ---------- HAMBURGER NAV ---------- */
+
+  .hamburger{
+    display:flex;
+    flex-direction: column;
+    justify-content:center;
+    gap: 5px;
+    width: 34px;
+    height: 34px;
+    background: none;
+    border: 1px solid var(--panel-line);
+    border-radius: 4px;
+    cursor: pointer;
+    align-items:center;
+  }
+  .hamburger span{
+    display:block;
+    width: 16px;
+    height: 1.5px;
+    background: var(--text-dim);
+    transition: transform .2s ease, opacity .2s ease;
+  }
+  .hamburger.open span:nth-child(1){ transform: translateY(6.5px) rotate(45deg); }
+  .hamburger.open span:nth-child(2){ opacity: 0; }
+  .hamburger.open span:nth-child(3){ transform: translateY(-6.5px) rotate(-45deg); }
+
+  #nav-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    background: rgba(6,22,24,0.97);
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  #nav-overlay.open{ opacity: 1; pointer-events: all; }
+
+  #nav-overlay a{
+    font-family:'Fraunces', serif;
+    font-size: clamp(24px, 5vw, 34px);
+    font-weight: 400;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 12px 0;
+    transition: color .15s ease;
+  }
+  #nav-overlay a:hover{ color: var(--gold); }
+
+  #nav-overlay .nav-close{
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  /* ---------- HERO ---------- */
+
+  .hero{
+    position: relative;
+    min-height: 78vh;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:center;
+    text-align:center;
+    padding: 60px 28px 100px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse at 62% 42%, rgba(255,150,90,0.35) 0%, transparent 50%),
+      linear-gradient(180deg, #2b1d3d 0%, #5c2a3f 30%, #a8492f 55%, #d97a3a 72%, #e8a24a 100%);
+  }
+
+  .hero-haze{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 62% 46%, rgba(255,224,170,0.45) 0%, transparent 40%),
+      linear-gradient(180deg, transparent 55%, rgba(20,10,25,0.25) 100%);
+    opacity: 1;
+  }
+
+  .hero-sun{
+    position:absolute;
+    top: 40%;
+    left: 62%;
+    transform: translate(-50%,-50%);
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 42% 38%, #fff3d6, #ffb15e 45%, #e8703c 80%);
+    box-shadow: 0 0 120px 40px rgba(255,150,80,0.4), 0 0 50px 12px rgba(255,210,150,0.55);
+  }
+
+  .hero-tide{
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    width: 100%;
+    height: 180px;
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 12px;
+    color: var(--gold);
+    margin-bottom: 22px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero h1{
+    position: relative;
+    z-index: 2;
+    font-size: clamp(36px, 7vw, 68px);
+    line-height: 1.08;
+    max-width: 16ch;
+    font-weight: 400;
+  }
+  .hero h1 em{ font-style: italic; color: var(--gold); }
+
+  .hero .dates{
+    position: relative;
+    z-index: 2;
+    margin-top: 26px;
+    font-size: 15px;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+  .hero .dates span{ color: var(--coral); }
+
+  .hero .sub{
+    position: relative;
+    z-index: 2;
+    max-width: 46ch;
+    margin: 22px auto 0;
+    color: var(--text-dim);
+    font-size: 16px;
+    font-weight: 300;
+  }
+
+  /* ---------- SECTION SHARED ---------- */
+
+  section{ padding: 90px 0; }
+
+  .section-head{ margin-bottom: 48px; max-width: 640px; }
+  .section-head .eyebrow{ margin-bottom: 14px; }
+  .section-head h2{ font-size: clamp(26px, 4vw, 38px); font-weight: 400; }
+  .section-head p{ color: var(--text-dim); margin-top: 16px; font-size: 15.5px; font-weight: 300; max-width: 54ch; }
+
+  /* ---------- VILLAS ---------- */
+
+  .villas{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .villa-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+  }
+  @media(max-width: 900px){ .villa-grid{ grid-template-columns: 1fr; } }
+
+  .villa-card{ background: var(--panel); padding: 34px 28px; display:flex; flex-direction:column; }
+
+  .villa-card .villa-tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--coral);
+    border: 1px solid var(--coral);
+    padding: 4px 9px;
+    border-radius: 3px;
+    margin-bottom: 18px;
+    align-self: flex-start;
+  }
+
+  .villa-card h3{ font-size: 21px; font-weight: 500; margin-bottom: 4px; }
+  .villa-card h3 a{
+    color: var(--text);
+    text-decoration: none;
+    background-image: linear-gradient(var(--gold), var(--gold));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition: color .15s ease;
+  }
+  .villa-card h3 a:hover{ color: var(--gold); background-size: 100% 1px; }
+
+  .villa-card .villa-loc{ font-size: 12px; color: var(--text-faint); margin-bottom: 14px; }
+  .villa-card p.desc{ font-size: 14px; color: var(--text-dim); font-weight: 300; margin: 0 0 22px; flex-grow: 1; }
+
+  .villa-card .villa-link{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-bottom: 1px solid var(--panel-line);
+    padding-bottom: 2px;
+    align-self: flex-start;
+    margin-bottom: 20px;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .villa-card .villa-link:hover{ color: var(--gold); border-color: var(--gold); }
+
+  .vote-row{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    border-top: 1px solid var(--panel-line);
+    padding-top: 18px;
+  }
+
+  .vote-btn{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    background: var(--bg-deep);
+    border: 1px solid var(--panel-line);
+    color: var(--text-dim);
+    padding: 9px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13.5px;
+    transition: all .15s ease;
+  }
+  .vote-btn svg{ width: 15px; height: 15px; stroke: currentColor; fill: none; }
+  .vote-btn:hover{ border-color: var(--gold); color: var(--gold); }
+  .vote-btn.voted{ background: rgba(207,165,61,0.14); border-color: var(--gold); color: var(--gold); }
+  .vote-btn.voted svg{ fill: var(--gold); }
+
+  .vote-count{ font-family:'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-faint); }
+
+  /* ---------- VILLA REVEAL ---------- */
+
+  .villa-reveal{
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+  }
+  @media(max-width: 860px){ .villa-reveal{ grid-template-columns: 1fr; } }
+
+  .villa-photos{
+    background: var(--bg-deep);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+    min-height: 340px;
+  }
+
+  .photo-placeholder{
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border: 1px dashed var(--panel-line);
+    margin: 12px;
+    color: var(--text-faint);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-align:center;
+    padding: 20px;
+  }
+
+  .villa-photos img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display:block;
+  }
+
+  .villa-info{ background: var(--panel); padding: 40px 34px; display:flex; flex-direction:column; justify-content:center; }
+  .villa-info .villa-tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--coral);
+    border: 1px solid var(--coral);
+    padding: 4px 9px;
+    border-radius: 3px;
+    margin-bottom: 18px;
+    align-self: flex-start;
+  }
+  .villa-info h3{ font-size: 26px; font-weight: 500; margin-bottom: 6px; }
+  .villa-info .villa-loc{ font-size: 12.5px; color: var(--text-faint); margin-bottom: 16px; }
+  .villa-info p.desc{ font-size: 14.5px; color: var(--text-dim); font-weight: 300; margin: 0; }
+
+  /* ---------- MAP ---------- */
+
+  .map-section{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .map-block{ margin-bottom: 32px; }
+  .map-block:last-child{ margin-bottom: 0; }
+
+  .map-label{ font-size: 12px; color: var(--gold); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .map-frame{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--panel-line);
+    overflow: hidden;
+  }
+  .map-frame iframe{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* ---------- MENU TILES ---------- */
+
+  .menu-tiles{
+    padding: 0;
+    background: var(--bg-deep);
+    border-bottom: 1px solid var(--panel-line);
+  }
+
+  .tile-grid{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    background: var(--panel-line);
+  }
+  @media(max-width: 860px){ .tile-grid{ grid-template-columns: repeat(3, 1fr); } }
+  @media(max-width: 480px){ .tile-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  .tile{
+    background: var(--bg-deep);
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+    gap: 12px;
+    padding: 30px 12px;
+    text-decoration: none;
+    color: var(--text-dim);
+    transition: background .15s ease, color .15s ease;
+  }
+  .tile:hover{ background: var(--panel); color: var(--gold); }
+  .tile svg{ width: 28px; height: 28px; }
+  .tile span{ font-family:'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; text-align:center; }
+
+  /* ---------- VILLA INTRO + GALLERY ---------- */
+
+  .villa-intro{
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    padding: 32px 34px;
+    margin-bottom: 2px;
+  }
+  .villa-intro .villa-tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--coral);
+    border: 1px solid var(--coral);
+    padding: 4px 9px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+  }
+  .villa-intro h3{ font-size: 24px; font-weight: 500; margin-bottom: 6px; }
+  .villa-intro .villa-loc{ font-size: 12.5px; color: var(--text-faint); margin-bottom: 14px; }
+  .villa-intro p.desc{ font-size: 14.5px; color: var(--text-dim); font-weight: 300; margin: 0; max-width: 70ch; }
+
+  .carousel{
+    position: relative;
+    background: var(--bg-deep);
+    border: 1px solid var(--panel-line);
+  }
+
+  .carousel-main{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--bg-deep);
+  }
+
+  .carousel-main img{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity .35s ease;
+    cursor: pointer;
+  }
+  .carousel-main img.active{ opacity: 1; }
+
+  .carousel-arrow{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(6,22,24,0.55);
+    border: 1px solid rgba(243,238,226,0.25);
+    color: var(--text);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor: pointer;
+    z-index: 5;
+    font-size: 20px;
+    transition: background .15s ease;
+  }
+  .carousel-arrow:hover{ background: rgba(6,22,24,0.85); }
+  .carousel-arrow.prev{ left: 16px; }
+  .carousel-arrow.next{ right: 16px; }
+
+  .carousel-count{
+    position: absolute;
+    bottom: 14px; right: 16px;
+    z-index: 5;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text);
+    background: rgba(6,22,24,0.55);
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+
+  .carousel-thumbs{
+    display:flex;
+    gap: 3px;
+    overflow-x: auto;
+    padding: 3px;
+    scrollbar-width: thin;
+  }
+  .carousel-thumbs img{
+    width: 76px;
+    height: 56px;
+    object-fit: cover;
+    flex-shrink: 0;
+    cursor: pointer;
+    opacity: 0.45;
+    transition: opacity .15s ease;
+  }
+  .carousel-thumbs img.active{ opacity: 1; outline: 2px solid var(--gold); outline-offset: -2px; }
+  .carousel-thumbs img:hover{ opacity: 0.8; }
+
+  #lightbox{
+    position: fixed;
+    inset: 0;
+    z-index: 970;
+    background: rgba(6,22,24,0.96);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+    padding: 40px;
+  }
+  #lightbox.open{ opacity: 1; pointer-events: all; }
+  #lightbox img{
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border: 1px solid var(--panel-line);
+  }
+  .lightbox-close{
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 32px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  /* ---------- ITINERARY ---------- */
+
+  .day-row{
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 24px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .day-row:last-child{ border-bottom: none; }
+
+  .day-row .day-tag{ font-family:'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-faint); line-height: 1.5; }
+  .day-row .day-tag .d{ display:block; color: var(--text-dim); font-size: 13px; margin-top: 2px; }
+
+  .day-row h4{ font-family:'Fraunces', serif; font-size: 16.5px; font-weight: 500; margin-bottom: 6px; }
+  .day-row p{ margin:0; font-size: 14.5px; color: var(--text-dim); font-weight: 300; }
+
+  .day-row.is-birthday{
+    background: linear-gradient(90deg, rgba(207,165,61,0.08), transparent);
+    border-left: 2px solid var(--gold);
+    padding-left: 20px;
+    margin-left: -22px;
+  }
+  .day-row.is-birthday .day-tag{ color: var(--gold); }
+  .day-row.is-birthday .day-tag .d{ color: var(--gold); }
+  .day-row.is-birthday h4{ color: var(--gold); }
+
+  /* ---------- WEATHER ---------- */
+
+  .weather{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .weather-grid{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media(max-width: 720px){ .weather-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  .weather-stat{ display:flex; flex-direction:column; gap: 8px; padding: 24px 22px; background: var(--bg-deep); border: 1px solid var(--panel-line); }
+  .w-value{ font-size: 26px; color: var(--gold); font-family:'IBM Plex Mono', monospace; }
+  .w-label{ font-size: 13px; color: var(--text-dim); font-weight: 300; line-height: 1.4; }
+
+  /* ---------- ARRIVAL INFO ---------- */
+
+  .arrival{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .arrival-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+  }
+  @media(max-width: 860px){ .arrival-grid{ grid-template-columns: 1fr; } }
+
+  .arrival-card{
+    background: var(--bg-deep);
+    padding: 32px 28px;
+    display:flex;
+    flex-direction: column;
+  }
+  .arrival-num{ font-size: 12px; color: var(--gold); margin-bottom: 16px; }
+  .arrival-card h3{ font-size: 18px; font-weight: 500; margin-bottom: 10px; }
+  .arrival-card p{ font-size: 14px; color: var(--text-dim); font-weight: 300; margin: 0 0 22px; flex-grow: 1; }
+
+  .arrival-btn{
+    display:inline-block;
+    align-self: flex-start;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--bg-deep);
+    background: var(--gold);
+    padding: 11px 18px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: opacity .15s ease;
+  }
+  .arrival-btn:hover{ opacity: 0.85; }
+
+  .driver-details{
+    border-top: 1px solid var(--panel-line);
+    padding-top: 16px;
+  }
+  .driver-details p.mono{ font-size: 12px; color: var(--text-faint); }
+
+  /* ---------- TRAVEL INFO ---------- */
+
+  .travel-info{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .travel-grid{
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+  }
+  @media(max-width: 780px){ .travel-grid{ grid-template-columns: 1fr; } }
+
+  .travel-col{ background: var(--bg); padding: 32px 30px; }
+  .travel-col ul{ list-style: none; margin:0; padding:0; }
+  .travel-col li{
+    font-size: 14.5px;
+    color: var(--text-dim);
+    font-weight: 300;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--panel-line);
+    display:flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .travel-col li:last-child{ border-bottom: none; }
+  .travel-col li::before{ content: '·'; color: var(--gold); font-size: 20px; line-height: 0; }
+  .travel-col li strong{ color: var(--text); font-weight: 500; }
+
+  .plug-card{
+    background: var(--bg-deep);
+    padding: 32px 26px;
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    text-align:center;
+    justify-content:center;
+  }
+  .plug-card svg{ margin-bottom: 18px; }
+  .plug-card .plug-label{ font-size: 13px; color: var(--gold); margin-bottom: 10px; }
+  .plug-card .plug-note{ font-size: 13px; color: var(--text-dim); font-weight: 300; max-width: 26ch; margin:0; }
+
+  /* ---------- PACKING ---------- */
+
+  .packing-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--panel-line); border: 1px solid var(--panel-line); }
+  @media(max-width: 780px){ .packing-grid{ grid-template-columns: 1fr; } }
+
+  .packing-col{ background: var(--bg); padding: 32px 30px; }
+  .packing-col h3{ font-size: 18px; font-weight: 500; margin-bottom: 6px; }
+  .packing-col .sub-label{ font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--coral); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 18px; display:block; }
+
+  .packing-col ul{ list-style: none; margin:0; padding:0; }
+  .packing-col li{
+    font-size: 14.5px;
+    color: var(--text-dim);
+    font-weight: 300;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--panel-line);
+    display:flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .packing-col li:last-child{ border-bottom: none; }
+  .packing-col li::before{ content: '·'; color: var(--gold); font-size: 20px; line-height: 0; }
+
+  footer{ padding: 50px 0; text-align:center; border-top: 1px solid var(--panel-line); }
+  footer p{ font-family:'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--text-faint); }
+
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="fw-canvas"></canvas>
+
+<!-- ============ PASSWORD GATE ============ -->
+<div id="gate">
+  <div class="gate-box">
+    <p class="eyebrow">PRIVATE INVITATION</p>
+    <h1>You're invited to <em>Davy's 60th</em></h1>
+    <p class="hint">Enter the password to open your invitation.</p>
+    <input type="password" id="gate-input" placeholder="Password" autocomplete="off">
+    <button id="gate-submit">Unlock</button>
+    <div id="gate-error"></div>
+  </div>
+</div>
+
+<!-- ============ SITE ============ -->
+<div id="site">
+
+  <div class="topbar">
+    <button class="hamburger" id="hamburger-btn" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="lang-group">
+      <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="lang-fr" onclick="setLang('fr')">FR</button>
+    </div>
+  </div>
+
+  <div id="nav-overlay">
+    <button class="nav-close" onclick="toggleNav()">&times;</button>
+    <a href="#top" onclick="toggleNav()" data-i18n="nav.home"></a>
+    <a href="#villa-section" onclick="toggleNav()" data-i18n="nav.villa"></a>
+    <a href="#map-section" onclick="toggleNav()" data-i18n="nav.map"></a>
+    <a href="#itinerary-section" onclick="toggleNav()" data-i18n="nav.itinerary"></a>
+    <a href="#weather-section" onclick="toggleNav()" data-i18n="nav.weather"></a>
+    <a href="#packing-section" onclick="toggleNav()" data-i18n="nav.packing"></a>
+    <a href="#travel-info-section" onclick="toggleNav()" data-i18n="nav.travelinfo"></a>
+    <a href="#arrival-section" onclick="toggleNav()" data-i18n="nav.arrival"></a>
+  </div>
+
+  <header class="hero" id="top">
+    <div class="hero-haze"></div>
+    <div class="hero-sun"></div>
+    <svg class="hero-tide" viewBox="0 0 1440 180" preserveAspectRatio="none">
+      <path fill="#7a3a3f" fill-opacity="0.85" d="M0,90 C240,140 480,50 720,80 C960,110 1200,50 1440,90 L1440,180 L0,180 Z"></path>
+      <path fill="#3a1f30" d="M0,120 C260,80 500,150 740,120 C980,90 1220,150 1440,120 L1440,180 L0,180 Z"></path>
+    </svg>
+    <p class="eyebrow" data-i18n="hero.eyebrow"></p>
+    <h1 data-i18n-html="hero.title"></h1>
+    <p class="dates mono" data-i18n-html="hero.dates"></p>
+    <p class="sub" data-i18n="hero.sub"></p>
+  </header>
+
+  <section class="menu-tiles">
+    <div class="wrap">
+      <div class="tile-grid">
+        <a class="tile" href="#villa-section">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M5 16L16 7l11 9" stroke="currentColor" stroke-width="1.6"/><rect x="8" y="16" width="16" height="10" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.villa"></span>
+        </a>
+        <a class="tile" href="#map-section">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M16 5c-4 0-7 3-7 7 0 5 7 15 7 15s7-10 7-15c0-4-3-7-7-7z" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="12" r="2.5" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.map"></span>
+        </a>
+        <a class="tile" href="#itinerary-section">
+          <svg viewBox="0 0 32 32" fill="none"><rect x="6" y="7" width="20" height="19" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M6 13h20M11 4v6M21 4v6" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.itinerary"></span>
+        </a>
+        <a class="tile" href="#weather-section">
+          <svg viewBox="0 0 32 32" fill="none"><circle cx="14" cy="14" r="6" stroke="currentColor" stroke-width="1.6"/><path d="M20 20c3 0 5.5-2.2 5.5-5s-2.2-5-5-5" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.weather"></span>
+        </a>
+        <a class="tile" href="#packing-section">
+          <svg viewBox="0 0 32 32" fill="none"><rect x="7" y="11" width="18" height="15" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M12 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.packing"></span>
+        </a>
+        <a class="tile" href="#travel-info-section">
+          <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="1.6"/><path d="M16 11v6l4 2" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.travelinfo"></span>
+        </a>
+        <a class="tile" href="#arrival-section">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M4 20l10-4 4-10 2 2-4 10 8-2 2 2-10 4-2 6-2-2 2-6-8 2-2-2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+          <span data-i18n="nav.arrival"></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="villas" id="villa-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="villas.eyebrow"></p>
+        <h2 data-i18n="villas.title"></h2>
+        <p data-i18n="villas.sub"></p>
+      </div>
+
+      <div class="villa-intro">
+        <span class="villa-tag" data-i18n="villas.anushka.tag"></span>
+        <h3>Villa Anushka</h3>
+        <div class="villa-loc" data-i18n="villas.anushka.loc"></div>
+        <p class="desc" data-i18n="villas.anushka.desc"></p>
+      </div>
+
+      <div class="carousel" id="carousel">
+        <div class="carousel-main" id="carousel-main">
+          <button class="carousel-arrow prev" onclick="carouselMove(-1)">&#8249;</button>
+          <button class="carousel-arrow next" onclick="carouselMove(1)">&#8250;</button>
+          <span class="carousel-count" id="carousel-count"></span>
+        </div>
+        <div class="carousel-thumbs" id="carousel-thumbs"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="map-section" id="map-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="map.eyebrow"></p>
+        <h2 data-i18n="map.title"></h2>
+        <p data-i18n="map.sub"></p>
+      </div>
+
+      <div class="map-block">
+        <p class="map-label mono" data-i18n="map.overview.label"></p>
+        <div class="map-frame">
+          <iframe src="https://www.google.com/maps?saddr=Bangkok,+Thailand&daddr=Koh+Samui,+Thailand&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+
+      <div class="map-block">
+        <p class="map-label mono" data-i18n="map.closeup.label"></p>
+        <div class="map-frame">
+          <iframe src="https://www.google.com/maps?q=Chaweng+Noi+Beach,+Koh+Samui,+Thailand&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="">
+    <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+  </div>
+
+  <section class="itinerary" id="itinerary-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="itin.eyebrow"></p>
+        <h2 data-i18n="itin.title"></h2>
+        <p data-i18n="itin.sub"></p>
+      </div>
+
+      <div id="itin-days"></div>
+    </div>
+  </section>
+
+  <section class="weather" id="weather-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="weather.eyebrow"></p>
+        <h2 data-i18n="weather.title"></h2>
+        <p data-i18n="weather.sub"></p>
+      </div>
+
+      <div class="weather-grid">
+        <div class="weather-stat"><span class="w-value">29°C</span><span class="w-label" data-i18n="weather.high"></span></div>
+        <div class="weather-stat"><span class="w-value">25°C</span><span class="w-label" data-i18n="weather.low"></span></div>
+        <div class="weather-stat"><span class="w-value">28°C</span><span class="w-label" data-i18n="weather.sea"></span></div>
+        <div class="weather-stat"><span class="w-value">~5</span><span class="w-label" data-i18n="weather.rain"></span></div>
+        <div class="weather-stat"><span class="w-value">9h</span><span class="w-label" data-i18n="weather.sun"></span></div>
+        <div class="weather-stat" data-i18n="weather.uv"><span class="w-value" data-i18n="weather.uvval"></span><span class="w-label" data-i18n="weather.uvlabel"></span></div>
+      </div>
+      <p style="margin-top:28px; font-size:14px; color:var(--text-dim); font-weight:300; max-width:60ch;" data-i18n="weather.note"></p>
+    </div>
+  </section>
+
+  <section class="packing" id="packing-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="packing.eyebrow"></p>
+        <h2 data-i18n="packing.title"></h2>
+        <p data-i18n="packing.sub"></p>
+      </div>
+
+      <div class="packing-grid">
+        <div class="packing-col">
+          <span class="sub-label" data-i18n="packing.everyone.label"></span>
+          <h3 data-i18n="packing.everyone.title"></h3>
+          <ul id="packing-everyone"></ul>
+        </div>
+        <div class="packing-col">
+          <span class="sub-label" data-i18n="packing.babies.label"></span>
+          <h3 data-i18n="packing.babies.title"></h3>
+          <ul id="packing-babies"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="travel-info" id="travel-info-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="travel.eyebrow"></p>
+        <h2 data-i18n="travel.title"></h2>
+        <p data-i18n="travel.sub"></p>
+      </div>
+
+      <div class="travel-grid">
+        <div class="travel-col">
+          <ul id="travel-list"></ul>
+        </div>
+        <div class="plug-card">
+          <svg viewBox="0 0 260 140" width="220" height="120">
+            <!-- UK plug (Type G) -->
+            <g>
+              <rect x="8" y="42" width="52" height="56" rx="6" fill="none" stroke="var(--text-dim)" stroke-width="2"/>
+              <rect x="28" y="30" width="8" height="16" fill="var(--text-dim)"/>
+              <rect x="14" y="30" width="8" height="16" fill="var(--text-dim)"/>
+              <rect x="42" y="30" width="8" height="16" fill="var(--text-dim)"/>
+              <text x="34" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--text-faint)">UK</text>
+            </g>
+            <!-- cross-out -->
+            <g stroke="var(--coral)" stroke-width="3" stroke-linecap="round">
+              <line x1="95" y1="50" x2="125" y2="80"/>
+              <line x1="125" y1="50" x2="95" y2="80"/>
+            </g>
+            <!-- Thai socket -->
+            <g>
+              <rect x="160" y="30" width="92" height="68" rx="10" fill="none" stroke="var(--gold)" stroke-width="2"/>
+              <rect x="192" y="48" width="6" height="20" rx="2" fill="var(--gold)"/>
+              <rect x="212" y="48" width="6" height="20" rx="2" fill="var(--gold)"/>
+              <circle cx="206" cy="82" r="4" fill="var(--gold)"/>
+              <text x="206" y="118" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--gold)">THAILAND</text>
+            </g>
+          </svg>
+          <p class="plug-label mono" data-i18n="travel.plug.label"></p>
+          <p class="plug-note" data-i18n="travel.plug.note"></p>
+        </div>
+      </div>
+
+      <p class="mono" style="margin-top:24px; font-size:11px; color:var(--text-faint);" data-i18n="travel.disclaimer"></p>
+    </div>
+  </section>
+
+  <section class="arrival" id="arrival-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="arrival.eyebrow"></p>
+        <h2 data-i18n="arrival.title"></h2>
+        <p data-i18n="arrival.sub"></p>
+      </div>
+
+      <div class="arrival-grid">
+
+        <div class="arrival-card">
+          <span class="arrival-num mono">01</span>
+          <h3 data-i18n="arrival.samui.title"></h3>
+          <p data-i18n="arrival.samui.desc"></p>
+          <a id="arrival-email-btn" class="arrival-btn" href="#" data-i18n="arrival.samui.button"></a>
+        </div>
+
+        <div class="arrival-card">
+          <span class="arrival-num mono">02</span>
+          <h3 data-i18n="arrival.whatsapp.title"></h3>
+          <p data-i18n="arrival.whatsapp.desc"></p>
+          <a class="arrival-btn" href="https://wa.me/447891086006" target="_blank" rel="noopener" data-i18n="arrival.whatsapp.button"></a>
+        </div>
+
+        <div class="arrival-card">
+          <span class="arrival-num mono">03</span>
+          <h3 data-i18n="arrival.driver.title"></h3>
+          <p data-i18n="arrival.driver.desc"></p>
+          <div class="driver-details" id="driver-details">
+            <p class="mono" data-i18n="arrival.driver.pending"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p data-i18n="footer.text"></p>
+  </footer>
+
+</div>
+
+<script>
+
+  /* ---------------- REDUCED MOTION CHECK ---------------- */
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------- AMBIENT DRIFTING BACKGROUND ---------------- */
+
+  (function ambientBackground(){
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let w, h, particles;
+
+    function resize(){
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const colors = ['#ffe9c2', '#ffcf88', '#f3eee2', '#ffb98a'];
+
+    function makeParticle(){
+      return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 1.4 + Math.random() * 2.6,
+        speed: 0.12 + Math.random() * 0.28,
+        drift: (Math.random() - 0.5) * 0.25,
+        alpha: 0.55 + Math.random() * 0.4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        twinkle: Math.random() * Math.PI * 2,
+        twinkleSpeed: 0.02 + Math.random() * 0.035
+      };
+    }
+
+    particles = Array.from({length: 90}, makeParticle);
+
+    function drawStar(p, alpha){
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.shadowBlur = p.r * 5;
+      ctx.shadowColor = p.color;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    if(reduceMotion){
+      particles.forEach(p => drawStar(p, p.alpha));
+      return;
+    }
+
+    function tick(){
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => {
+        p.y -= p.speed;
+        p.x += p.drift;
+        p.twinkle += p.twinkleSpeed;
+        if(p.y < -10){ Object.assign(p, makeParticle(), {y: h + 10}); }
+        const flicker = 0.5 + Math.sin(p.twinkle) * 0.5;
+        drawStar(p, p.alpha * flicker);
+      });
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
+
+  /* ---------------- FIREWORKS BURST ---------------- */
+
+  function launchFireworks(onDone){
+    const canvas = document.getElementById('fw-canvas');
+    if(reduceMotion){ onDone(); return; }
+
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
+    canvas.classList.add('active');
+
+    const palette = ['#cfa53d', '#e4694a', '#f3eee2', '#e8a13c'];
+    let particles = [];
+
+    function burst(x, y){
+      const count = 46;
+      const color = palette[Math.floor(Math.random() * palette.length)];
+      for(let i = 0; i < count; i++){
+        const angle = (Math.PI * 2 * i) / count;
+        const speed = 2 + Math.random() * 3.5;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 1,
+          decay: 0.012 + Math.random() * 0.012,
+          color,
+          r: 1.5 + Math.random() * 1.5
+        });
+      }
+    }
+
+    // stagger several bursts across the sky
+    const burstPoints = [
+      [0.5, 0.35], [0.25, 0.45], [0.75, 0.4], [0.4, 0.25], [0.6, 0.5]
+    ];
+    burstPoints.forEach((pt, i) => {
+      setTimeout(() => burst(w * pt[0], h * pt[1]), i * 320);
+    });
+
+    let frame = 0;
+    const maxFrames = 220;
+
+    function tick(){
+      frame++;
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.045; // gravity
+        p.life -= p.decay;
+        if(p.life > 0){
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(p.life, 0);
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+      ctx.globalAlpha = 1;
+      particles = particles.filter(p => p.life > 0);
+
+      if(frame < maxFrames){
+        requestAnimationFrame(tick);
+      } else {
+        canvas.classList.remove('active');
+        setTimeout(() => { ctx.clearRect(0,0,w,h); }, 400);
+        onDone();
+      }
+    }
+    tick();
+  }
+
+  /* ---------------- PASSWORD GATE ---------------- */
+
+  function normalize(s){
+    return s.trim().toLowerCase().replace(/['’‘]/g, "'").replace(/\s+/g, ' ');
+  }
+
+  const PASSWORD = normalize("Davy's 60th");
+
+  function tryUnlock(){
+    const val = document.getElementById('gate-input').value;
+    const err = document.getElementById('gate-error');
+    if(normalize(val) === PASSWORD){
+      err.textContent = '';
+      sessionStorage.setItem('davy60_unlocked', '1');
+      launchFireworks(() => {
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('site').classList.add('unlocked');
+      });
+    } else {
+      err.textContent = (currentLang === 'fr') ? "Mot de passe incorrect. Réessayez." : "That's not quite it — try again.";
+    }
+  }
+
+  document.getElementById('gate-submit').addEventListener('click', tryUnlock);
+  document.getElementById('gate-input').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+
+  if(sessionStorage.getItem('davy60_unlocked') === '1'){
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('site').classList.add('unlocked');
+  }
+
+  /* ---------------- TRANSLATIONS ---------------- */
+
+  const T = {
+    en: {
+      "hero.eyebrow": "YOU'RE INVITED",
+      "hero.title": "Davy's turning <em>60</em>, in Thailand",
+      "hero.dates": "KOH SAMUI · <span style='color:var(--coral)'>29 JANUARY &ndash; 11 FEBRUARY 2028</span>",
+      "hero.sub": "Two weeks together on the island, one big birthday in the middle of it. Have a look around and get ready.",
+      "villas.eyebrow": "WHERE WE'RE STAYING",
+      "villas.title": "Meet Villa Anushka",
+      "villas.sub": "After weighing everything up, this is the one — here's a first look while we get the full write-up and photos ready.",
+      "villas.photosoon": "Photos coming soon",
+      "villas.anushka.tag": "Home for the week",
+      "villas.anushka.loc": "Koh Samui, Thailand",
+      "villas.anushka.desc": "Full details on the way — check back soon for the full story on the villa, the rooms, and what makes it special.",
+      "villas.linksoon": "Booking link coming soon",
+      "itin.eyebrow": "THE PLAN",
+      "itin.title": "Fourteen days, roughly mapped out",
+      "itin.sub": "Nothing here is set in stone — this is a shape to fill in together once we're all there, not a schedule to follow to the minute.",
+      "weather.eyebrow": "WHAT TO EXPECT",
+      "weather.title": "Weather in early February",
+      "weather.sub": "Good news — early February sits right in Koh Samui's driest, sunniest stretch of the year.",
+      "weather.high": "Average daytime high",
+      "weather.low": "Average nighttime low",
+      "weather.sea": "Sea temperature",
+      "weather.rain": "Rainy days across the trip",
+      "weather.sun": "Sunshine per day, on average",
+      "weather.uvval": "Very High",
+      "weather.uvlabel": "UV index — sunscreen is non-negotiable",
+      "weather.note": "Rain, if it comes, tends to be a short, heavy shower rather than an all-day drizzle. Humidity sits around 80%, so pack light, breathable fabrics.",
+      "packing.eyebrow": "GETTING READY",
+      "packing.title": "What to bring",
+      "packing.sub": "A loose packing list — nothing fancy required, just the essentials for sun, sea, and everything in between.",
+      "packing.everyone.label": "For everyone",
+      "packing.everyone.title": "The basics",
+      "packing.babies.label": "Travelling with little ones",
+      "packing.babies.title": "Baby & toddler essentials",
+      "nav.home": "Home",
+      "nav.villa": "The Villa",
+      "nav.map": "Map",
+      "nav.itinerary": "Itinerary",
+      "nav.weather": "Weather",
+      "nav.packing": "What to Bring",
+      "nav.travelinfo": "Before You Travel",
+      "nav.arrival": "Arrival Info",
+      "travel.eyebrow": "PLANNING AHEAD",
+      "travel.title": "What to expect before travelling",
+      "travel.sub": "A quick checklist to sort out before you fly — nothing urgent, just worth doing early.",
+      "travel.plug.label": "PLUG TYPE",
+      "travel.plug.note": "UK plugs don't fit Thai sockets — bring a travel adapter.",
+      "travel.disclaimer": "Entry requirements can change — always double-check official guidance closer to your travel date.",
+      "arrival.eyebrow": "LANDING IN THAILAND",
+      "arrival.title": "Once you've landed",
+      "arrival.sub": "A few practical things to sort out the moment you touch down.",
+      "arrival.samui.title": "Flying into Koh Samui?",
+      "arrival.samui.desc": "We're based in Koh Samui, and we're organising pickup and transfer from Koh Samui airport. If you're routing through Bangkok first, that's completely fine — we just need your Koh Samui arrival flight number and time to arrange your transfer.",
+      "arrival.samui.button": "Send my arrival details ↗",
+      "arrival.whatsapp.title": "Any issues on the day?",
+      "arrival.whatsapp.desc": "If anything comes up — a delay, a missed connection, anything at all — message Renato directly on WhatsApp and we'll sort it out.",
+      "arrival.whatsapp.button": "Message on WhatsApp ↗",
+      "arrival.driver.title": "Your driver",
+      "arrival.driver.desc": "Details of the driver collecting you from Koh Samui airport — name, vehicle, and contact number.",
+      "arrival.driver.pending": "Driver details to be confirmed closer to the date.",
+      "map.eyebrow": "FINDING YOUR WAY",
+      "map.title": "Getting your bearings",
+      "map.sub": "Both maps below are fully interactive — zoom, pan, and explore just like normal Google Maps.",
+      "map.overview.label": "THAILAND OVERVIEW — BANGKOK TO KOH SAMUI",
+      "map.closeup.label": "CHAWENG NOI BEACH — THE VILLA IS RIGHT HERE",
+      "footer.text": "SEE YOU IN THAILAND · DAVY'S 60TH · 29 JAN – 11 FEB 2028"
+    },
+    fr: {
+      "hero.eyebrow": "VOUS ÊTES INVITÉS",
+      "hero.title": "Davy fête ses <em>60 ans</em>, en Thaïlande",
+      "hero.dates": "KOH SAMUI · <span style='color:var(--coral)'>DU 29 JANVIER AU 11 FÉVRIER 2028</span>",
+      "hero.sub": "Deux semaines ensemble sur l'île, avec un grand anniversaire au milieu. Jetez un œil et préparez-vous.",
+      "villas.eyebrow": "OÙ NOUS LOGEONS",
+      "villas.title": "Découvrez la Villa Anushka",
+      "villas.sub": "Après avoir tout pesé, c'est celle-ci — un premier aperçu en attendant la description complète et les photos.",
+      "villas.photosoon": "Photos à venir",
+      "villas.anushka.tag": "Notre maison pour la semaine",
+      "villas.anushka.loc": "Koh Samui, Thaïlande",
+      "villas.anushka.desc": "Détails à venir — revenez bientôt pour découvrir la villa, les chambres, et ce qui la rend spéciale.",
+      "villas.linksoon": "Lien de réservation à venir",
+      "itin.eyebrow": "LE PROGRAMME",
+      "itin.title": "Quatorze jours, grossièrement planifiés",
+      "itin.sub": "Rien n'est gravé dans le marbre ici — c'est une trame à remplir ensemble une fois sur place, pas un horaire à suivre à la minute près.",
+      "weather.eyebrow": "À QUOI S'ATTENDRE",
+      "weather.title": "La météo début février",
+      "weather.sub": "Bonne nouvelle — début février tombe pile dans la période la plus sèche et la plus ensoleillée de l'année à Koh Samui.",
+      "weather.high": "Température maximale moyenne",
+      "weather.low": "Température minimale moyenne",
+      "weather.sea": "Température de la mer",
+      "weather.rain": "Jours de pluie sur le séjour",
+      "weather.sun": "Heures d'ensoleillement par jour, en moyenne",
+      "weather.uvval": "Très élevé",
+      "weather.uvlabel": "Indice UV — la crème solaire n'est pas négociable",
+      "weather.note": "S'il pleut, ce sera plutôt une averse courte et forte qu'une pluie fine toute la journée. L'humidité avoisine 80 %, prévoyez des tissus légers et respirants.",
+      "packing.eyebrow": "PRÉPARATIFS",
+      "packing.title": "Quoi emporter",
+      "packing.sub": "Une liste indicative — rien de sophistiqué requis, juste l'essentiel pour le soleil, la mer, et tout le reste.",
+      "packing.everyone.label": "Pour tout le monde",
+      "packing.everyone.title": "Les essentiels",
+      "packing.babies.label": "Avec des tout-petits",
+      "packing.babies.title": "Essentiels bébé & enfant en bas âge",
+      "nav.home": "Accueil",
+      "nav.villa": "La Villa",
+      "nav.map": "Carte",
+      "nav.itinerary": "Programme",
+      "nav.weather": "Météo",
+      "nav.packing": "Quoi emporter",
+      "nav.travelinfo": "Avant de partir",
+      "nav.arrival": "Infos d'arrivée",
+      "travel.eyebrow": "SE PRÉPARER",
+      "travel.title": "À quoi s'attendre avant de partir",
+      "travel.sub": "Une petite liste à régler avant le vol — rien d'urgent, mais mieux vaut s'y prendre tôt.",
+      "travel.plug.label": "TYPE DE PRISE",
+      "travel.plug.note": "Les prises britanniques ne rentrent pas dans les prises thaïlandaises — prévoyez un adaptateur.",
+      "travel.disclaimer": "Les conditions d'entrée peuvent changer — vérifiez toujours les informations officielles plus près de votre date de voyage.",
+      "arrival.eyebrow": "ARRIVÉE EN THAÏLANDE",
+      "arrival.title": "Une fois arrivés",
+      "arrival.sub": "Quelques points pratiques à régler dès l'atterrissage.",
+      "arrival.samui.title": "Vous arrivez à Koh Samui ?",
+      "arrival.samui.desc": "Nous logeons à Koh Samui, et nous organisons la prise en charge et le transfert depuis l'aéroport de Koh Samui. Si vous passez d'abord par Bangkok, aucun problème — nous avons juste besoin de votre numéro de vol et de l'heure d'arrivée à Koh Samui pour organiser votre transfert.",
+      "arrival.samui.button": "Envoyer mes détails d'arrivée ↗",
+      "arrival.whatsapp.title": "Un souci le jour J ?",
+      "arrival.whatsapp.desc": "S'il y a le moindre imprévu — un retard, une correspondance manquée, quoi que ce soit — écrivez directement à Renato sur WhatsApp et on réglera ça ensemble.",
+      "arrival.whatsapp.button": "Écrire sur WhatsApp ↗",
+      "arrival.driver.title": "Votre chauffeur",
+      "arrival.driver.desc": "Détails du chauffeur qui viendra vous chercher à l'aéroport de Koh Samui — nom, véhicule et numéro de contact.",
+      "arrival.driver.pending": "Détails du chauffeur à confirmer plus près de la date.",
+      "map.eyebrow": "SE REPÉRER",
+      "map.title": "Se repérer sur la carte",
+      "map.sub": "Les deux cartes ci-dessous sont entièrement interactives — zoomez, déplacez-vous, explorez comme sur Google Maps normalement.",
+      "map.overview.label": "APERÇU DE LA THAÏLANDE — BANGKOK À KOH SAMUI",
+      "map.closeup.label": "PLAGE DE CHAWENG NOI — LA VILLA EST JUSTE ICI",
+      "footer.text": "RENDEZ-VOUS EN THAÏLANDE · 60 ANS DE DAVY · 29 JAN – 11 FÉV 2028"
+    }
+  };
+
+  const ITIN = {
+    en: [
+      {tag:"DAY 1", d:"Sat 29 Jan", t:"Arrival & Welcome", p:"Check in to the villa through the afternoon. Nothing planned tonight beyond a welcome dinner together — settle in, find your room, get in the pool."},
+      {tag:"DAY 2", d:"Sun 30 Jan", t:"Settle In", p:"A slow first full day. Pool, beach, and no schedule — a good day to shake off the jet lag before things pick up."},
+      {tag:"DAY 3", d:"Mon 31 Jan", t:"Fisherman's Village", p:"An evening in Bophut's Fisherman's Village — a walkable night market and dinner along the old shophouse strip."},
+      {tag:"DAY 4", d:"Tue 1 Feb", t:"Do What You Want Day", p:"Wide open — beach, pool, explore the island, or just do nothing. No plans, on purpose."},
+      {tag:"DAY 5", d:"Wed 2 Feb", t:"Spa Day", p:"A spa day organised by the host — details closer to the time. Sit back and let it happen."},
+      {tag:"DAY 6", d:"Thu 3 Feb", t:"Do What You Want Day", p:"Another wide open one — beach, pool, explore, or just rest up before tomorrow."},
+      {tag:"DAY 7", d:"Fri 4 Feb", t:"Davy's 60th 🎉", p:"A celebration of Davy. More info will be told closer to the day — just be there.", bday:true},
+      {tag:"DAY 8", d:"Sat 5 Feb", t:"Slow Morning", p:"Recovery day, on purpose. Late breakfast, villa time, maybe a walk along the beach in the afternoon."},
+      {tag:"DAY 9", d:"Sun 6 Feb", t:"Sunset Cruise", p:"An evening boat trip along the coast to watch the sun go down over the water — details to follow closer to the date."},
+      {tag:"DAY 10", d:"Mon 7 Feb", t:"Koh Tao Day Trip", p:"An optional full-day trip to Koh Tao for snorkelling in clear water — for anyone up for a longer day out."},
+      {tag:"DAY 11", d:"Tue 8 Feb", t:"Temples & Culture", p:"Morning visit to the Big Buddha and Wat Plai Laem — best done early before the heat and the crowds arrive."},
+      {tag:"DAY 12", d:"Wed 9 Feb", t:"Villa Day & Cooking Class", p:"A quiet one at the villa, with an optional Thai cooking class in the afternoon for anyone interested."},
+      {tag:"DAY 13", d:"Thu 10 Feb", t:"Last Full Day", p:"Open — beach, pool, last-minute shopping in Fisherman's Village, or just soaking up the final full day."},
+      {tag:"DAY 14", d:"Fri 11 Feb", t:"Departure", p:"Final breakfast together, pack up, and head to the airport. Safe travels home."}
+    ],
+    fr: [
+      {tag:"JOUR 1", d:"Sam 29 jan", t:"Arrivée & bienvenue", p:"Check-in à la villa dans l'après-midi. Rien de prévu ce soir à part un dîner de bienvenue ensemble — installez-vous, trouvez votre chambre, plongez dans la piscine."},
+      {tag:"JOUR 2", d:"Dim 30 jan", t:"On prend ses marques", p:"Une première journée tranquille. Piscine, plage, et aucun programme — idéal pour se remettre du décalage horaire avant que ça commence vraiment."},
+      {tag:"JOUR 3", d:"Lun 31 jan", t:"Fisherman's Village", p:"Une soirée au Fisherman's Village de Bophut — un marché nocturne à parcourir à pied et un dîner le long des anciennes maisons de commerce."},
+      {tag:"JOUR 4", d:"Mar 1 fév", t:"Journée libre", p:"Grand ouvert — plage, piscine, explorer l'île, ou ne rien faire du tout. Aucun programme, volontairement."},
+      {tag:"JOUR 5", d:"Mer 2 fév", t:"Journée spa", p:"Une journée spa organisée par l'hôte — détails plus près de la date. Installez-vous et profitez."},
+      {tag:"JOUR 6", d:"Jeu 3 fév", t:"Journée libre", p:"Encore une journée grand ouvert — plage, piscine, exploration, ou repos avant demain."},
+      {tag:"JOUR 7", d:"Ven 4 fév", t:"Les 60 ans de Davy 🎉", p:"Une célébration pour Davy. Plus de détails seront communiqués plus près du jour J — soyez juste là.", bday:true},
+      {tag:"JOUR 8", d:"Sam 5 fév", t:"Matinée tranquille", p:"Journée de récupération, volontairement. Petit-déjeuner tardif, temps à la villa, peut-être une balade sur la plage l'après-midi."},
+      {tag:"JOUR 9", d:"Dim 6 fév", t:"Croisière au coucher du soleil", p:"Une sortie en bateau en soirée le long de la côte pour voir le soleil se coucher sur l'eau — détails à confirmer plus près de la date."},
+      {tag:"JOUR 10", d:"Lun 7 fév", t:"Excursion à Koh Tao", p:"Une excursion optionnelle d'une journée à Koh Tao pour faire du snorkeling en eau claire — pour ceux qui sont partants pour une journée plus longue."},
+      {tag:"JOUR 11", d:"Mar 8 fév", t:"Temples & culture", p:"Visite matinale du Big Buddha et du Wat Plai Laem — mieux vaut y aller tôt, avant la chaleur et la foule."},
+      {tag:"JOUR 12", d:"Mer 9 fév", t:"Journée villa & cours de cuisine", p:"Une journée calme à la villa, avec un cours de cuisine thaïlandaise optionnel l'après-midi pour les intéressés."},
+      {tag:"JOUR 13", d:"Jeu 10 fév", t:"Dernière journée complète", p:"Libre — plage, piscine, derniers achats à Fisherman's Village, ou simplement profiter de cette dernière journée."},
+      {tag:"JOUR 14", d:"Ven 11 fév", t:"Départ", p:"Dernier petit-déjeuner ensemble, on fait les valises, direction l'aéroport. Bon retour à tous."}
+    ]
+  };
+
+  const PACKING = {
+    en: {
+      everyone: [
+        "Light, breathable clothing (shorts, linen shirts, sundresses)",
+        "Swimwear — bring two, one is always drying",
+        "Reef-safe sunscreen, high SPF",
+        "Sunglasses & a wide-brim hat",
+        "Flip-flops or sandals",
+        "A light rain jacket or poncho — short, heavy showers happen",
+        "Insect repellent",
+        "A modest cover-up for temple visits (shoulders & knees)",
+        "UK-to-Thailand plug adapter",
+        "A portable phone charger"
+      ],
+      babies: [
+        "Baby-safe, mineral-based sunscreen (SPF 50)",
+        "A UV sun suit or swim shirt",
+        "A pop-up shade tent for the beach",
+        "Mosquito net, safe for infants",
+        "A portable fan for the villa",
+        "Familiar snacks & formula — not everything is easy to find locally",
+        "A basic first aid kit (thermometer, infant paracetamol)",
+        "Rehydration sachets, just in case"
+      ]
+    },
+    fr: {
+      everyone: [
+        "Vêtements légers et respirants (shorts, chemises en lin, robes d'été)",
+        "Maillots de bain — prenez-en deux, il y en a toujours un qui sèche",
+        "Crème solaire respectueuse des récifs, indice élevé",
+        "Lunettes de soleil & chapeau à large bord",
+        "Tongs ou sandales",
+        "Une veste de pluie légère ou un poncho — averses courtes mais fortes possibles",
+        "Répulsif anti-moustiques",
+        "Une tenue couvrante pour les visites de temples (épaules et genoux couverts)",
+        "Adaptateur de prise pour la Thaïlande",
+        "Une batterie externe pour le téléphone"
+      ],
+      babies: [
+        "Crème solaire minérale adaptée aux bébés (SPF 50)",
+        "Une combinaison anti-UV ou un tee-shirt de bain",
+        "Une tente pare-soleil pliable pour la plage",
+        "Une moustiquaire adaptée aux nourrissons",
+        "Un ventilateur portable pour la villa",
+        "Snacks et lait infantile habituels — pas toujours faciles à trouver sur place",
+        "Une trousse de premiers secours de base (thermomètre, paracétamol enfant)",
+        "Sachets de réhydratation, au cas où"
+      ]
+    }
+  };
+
+  const TRAVEL_INFO = {
+    en: [
+      "Valid passport with <strong>at least 6 months</strong> validity remaining from your travel date",
+      "UK passport holders don't currently need a visa for a short tourist stay — worth double-checking closer to the date, as Thailand has approved shortening the visa-free window and the exact rules may have changed by 2028",
+      "Immigration can occasionally ask for proof of funds — roughly <strong>10,000 THB per person</strong> (or 20,000 THB per family) — rarely checked, but good to have",
+      "Get some Thai Baht converted before you travel, or plan to withdraw on arrival",
+      "Take out <strong>travel insurance</strong> that covers medical emergencies",
+      "If your phone is unlocked, a local eSIM is easy and cheap — around €10 for 10GB. Otherwise, check with your carrier about a Thailand roaming add-on",
+      "The villa has <strong>WiFi</strong> available",
+      "Pack any medication you might need — ibuprofen, paracetamol, mosquito repellent, and sun cream"
+    ],
+    fr: [
+      "Passeport valide avec <strong>au moins 6 mois</strong> de validité restante à partir de la date de voyage",
+      "Les titulaires d'un passeport britannique n'ont actuellement pas besoin de visa pour un court séjour touristique — à vérifier plus près de la date, car la Thaïlande a approuvé une réduction de cette période et les règles exactes pourraient avoir changé d'ici 2028",
+      "L'immigration peut occasionnellement demander une preuve de fonds — environ <strong>10 000 THB par personne</strong> (ou 20 000 THB par famille) — rarement vérifié, mais bon à avoir",
+      "Faites convertir des bahts thaïlandais avant de partir, ou prévoyez un retrait à l'arrivée",
+      "Souscrivez une <strong>assurance voyage</strong> couvrant les urgences médicales",
+      "Si votre téléphone est débloqué, une eSIM locale est simple et peu coûteuse — environ 10€ pour 10 Go. Sinon, vérifiez auprès de votre opérateur les options d'itinérance en Thaïlande",
+      "La villa dispose du <strong>WiFi</strong>",
+      "Emportez les médicaments dont vous pourriez avoir besoin — ibuprofène, paracétamol, répulsif anti-moustiques et crème solaire"
+    ]
+  };
+
+  function renderTravelInfo(lang){
+    const ul = document.getElementById('travel-list');
+    ul.innerHTML = TRAVEL_INFO[lang].map(i => `<li>${i}</li>`).join('');
+  }
+
+  let currentLang = 'en';
+
+  function renderItinerary(lang){
+    const container = document.getElementById('itin-days');
+    container.innerHTML = '';
+    ITIN[lang].forEach(day => {
+      const row = document.createElement('div');
+      row.className = 'day-row' + (day.bday ? ' is-birthday' : '');
+      row.innerHTML = `
+        <div class="day-tag">${day.tag}<span class="d">${day.d}</span></div>
+        <div><h4>${day.t}</h4><p>${day.p}</p></div>
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  function renderPacking(lang){
+    const evUl = document.getElementById('packing-everyone');
+    const baUl = document.getElementById('packing-babies');
+    evUl.innerHTML = PACKING[lang].everyone.map(i => `<li>${i}</li>`).join('');
+    baUl.innerHTML = PACKING[lang].babies.map(i => `<li>${i}</li>`).join('');
+  }
+
+  function setLang(lang){
+    currentLang = lang;
+    document.documentElement.lang = lang;
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.getElementById('lang-fr').classList.toggle('active', lang === 'fr');
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if(T[lang][key] !== undefined) el.textContent = T[lang][key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+      const key = el.getAttribute('data-i18n-html');
+      if(T[lang][key] !== undefined) el.innerHTML = T[lang][key];
+    });
+
+    renderItinerary(lang);
+    renderPacking(lang);
+    renderTravelInfo(lang);
+    updateMailtoLink(lang);
+  }
+
+  function updateMailtoLink(lang){
+    const subject = lang === 'fr' ? "Mes détails d'arrivée à Koh Samui" : "My Koh Samui arrival details";
+    const body = lang === 'fr'
+      ? "Bonjour Renato,\n\nVoici mes détails d'arrivée à Koh Samui :\n\nNom :\nDate d'arrivée :\nNuméro de vol :\nHeure d'arrivée :\n\nMerci !"
+      : "Hi Renato,\n\nHere are my Koh Samui arrival details:\n\nName:\nArrival date:\nFlight number:\nArrival time:\n\nThanks!";
+    const link = document.getElementById('arrival-email-btn');
+    if(link) link.href = `mailto:nado90@me.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }
+
+  setLang('en');
+
+  /* ---------------- HAMBURGER NAV ---------------- */
+
+  function toggleNav(){
+    document.getElementById('nav-overlay').classList.toggle('open');
+    document.getElementById('hamburger-btn').classList.toggle('open');
+  }
+
+  /* ---------------- VILLA PHOTO CAROUSEL ---------------- */
+
+  const PHOTO_COUNT = 74;
+  let carouselIndex = 0;
+  const photoSrcs = Array.from({length: PHOTO_COUNT}, (_, i) => `villa-photos/villa-${String(i+1).padStart(2,'0')}.jpg`);
+
+  function renderCarousel(){
+    const main = document.getElementById('carousel-main');
+    const thumbs = document.getElementById('carousel-thumbs');
+
+    photoSrcs.forEach((src, i) => {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = `Villa Anushka photo ${i+1}`;
+      img.loading = i < 3 ? 'eager' : 'lazy';
+      if(i === 0) img.classList.add('active');
+      img.onclick = () => openLightbox(src);
+      main.appendChild(img);
+
+      const thumb = document.createElement('img');
+      thumb.src = src;
+      thumb.loading = 'lazy';
+      if(i === 0) thumb.classList.add('active');
+      thumb.onclick = () => setCarousel(i);
+      thumbs.appendChild(thumb);
+    });
+
+    updateCarouselCount();
+  }
+
+  function setCarousel(i){
+    carouselIndex = (i + PHOTO_COUNT) % PHOTO_COUNT;
+    document.querySelectorAll('#carousel-main img').forEach((img, idx) => img.classList.toggle('active', idx === carouselIndex));
+    document.querySelectorAll('#carousel-thumbs img').forEach((img, idx) => img.classList.toggle('active', idx === carouselIndex));
+    const activeThumb = document.querySelectorAll('#carousel-thumbs img')[carouselIndex];
+    if(activeThumb) activeThumb.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+    updateCarouselCount();
+  }
+
+  function carouselMove(delta){ setCarousel(carouselIndex + delta); }
+
+  function updateCarouselCount(){
+    document.getElementById('carousel-count').textContent = `${carouselIndex + 1} / ${PHOTO_COUNT}`;
+  }
+
+  renderCarousel();
+
+  function openLightbox(src){
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox(e){
+    if(e) e.stopPropagation();
+    document.getElementById('lightbox').classList.remove('open');
+  }
+
+  /* ---------------- VILLA VOTING (shared, via CountAPI) ---------------- */
+
+  const NS = 'davys60th-samui-2028-v1';
+  const villaKeys = ['villa-aruna','villa-hin','villa-laplaya'];
+
+  async function loadCounts(){
+    for(const key of villaKeys){
+      const el = document.querySelector(`[data-count="${key}"]`);
+      try{
+        const res = await fetch(`https://api.countapi.xyz/get/${NS}/${key}`);
+        const data = await res.json();
+        el.textContent = (data.value || 0) + (data.value === 1 ? ' vote' : ' votes');
+      } catch(e){
+        el.textContent = '– votes';
+      }
+    }
+  }
+
+  async function toggleVote(btn){
+    const key = btn.getAttribute('data-villa');
+    const el = document.querySelector(`[data-count="${key}"]`);
+    const votedFlag = 'voted_' + key;
+    const alreadyVoted = localStorage.getItem(votedFlag) === '1';
+
+    btn.disabled = true;
+    try{
+      if(!alreadyVoted){
+        const res = await fetch(`https://api.countapi.xyz/hit/${NS}/${key}`);
+        const data = await res.json();
+        el.textContent = data.value + (data.value === 1 ? ' vote' : ' votes');
+        localStorage.setItem(votedFlag, '1');
+        btn.classList.add('voted');
+      } else {
+        const res = await fetch(`https://api.countapi.xyz/update/${NS}/${key}?amount=-1`);
+        const data = await res.json();
+        el.textContent = Math.max(0,data.value) + (data.value === 1 ? ' vote' : ' votes');
+        localStorage.removeItem(votedFlag);
+        btn.classList.remove('voted');
+      }
+    } catch(e){
+      // offline fallback: just toggle the visual state
+      btn.classList.toggle('voted');
+      if(!alreadyVoted) localStorage.setItem(votedFlag,'1'); else localStorage.removeItem(votedFlag);
+    }
+    btn.disabled = false;
+  }
+
+</script>
+
+</body>
+</html>
