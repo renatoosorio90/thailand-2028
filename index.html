@@ -989,7 +989,7 @@
     <p class="eyebrow" data-i18n="gate.eyebrow">PRIVATE INVITATION</p>
     <h1 data-i18n-html="gate.title">You're invited to <em>Davy's 60th</em></h1>
     <p class="hint" data-i18n="gate.hint">Enter the password to open your invitation.</p>
-    <input type="password" id="gate-input" placeholder="Password" autocomplete="off">
+    <input type="password" id="gate-input" data-i18n-placeholder="gate.placeholder" placeholder="Password" autocomplete="off">
     <button id="gate-submit" data-i18n="gate.button">Unlock</button>
     <div id="gate-error"></div>
   </div>
@@ -998,7 +998,7 @@
     <p class="eyebrow" data-i18n="name.eyebrow">ALMOST THERE</p>
     <h1 data-i18n="name.title">What's your name?</h1>
     <p class="hint" data-i18n="name.hint">So we know who's coming.</p>
-    <input type="text" id="name-input" placeholder="Your name" autocomplete="off">
+    <input type="text" id="name-input" data-i18n-placeholder="name.placeholder" placeholder="Your name" autocomplete="off">
     <button id="name-submit" data-i18n="name.button">Continue</button>
     <div id="name-error"></div>
   </div>
@@ -1549,6 +1549,8 @@
       "gate.title": "You're invited to <em>Davy's 60th</em>",
       "gate.hint": "Enter the password to open your invitation.",
       "gate.button": "Unlock",
+      "gate.placeholder": "Password",
+      "name.placeholder": "Your name",
       "name.eyebrow": "ALMOST THERE",
       "name.title": "What's your name?",
       "name.hint": "So we know who's coming.",
@@ -1641,6 +1643,8 @@
       "gate.title": "Vous êtes invités aux <em>60 ans de Davy</em>",
       "gate.hint": "Entrez le mot de passe pour ouvrir votre invitation.",
       "gate.button": "Déverrouiller",
+      "gate.placeholder": "Mot de passe",
+      "name.placeholder": "Votre nom",
       "name.eyebrow": "PRESQUE FINI",
       "name.title": "Quel est votre prénom ?",
       "name.hint": "Pour savoir qui vient.",
@@ -1946,6 +1950,13 @@
       const key = el.getAttribute('data-i18n-html');
       if(T[lang][key] !== undefined) el.innerHTML = T[lang][key];
     });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if(T[lang][key] !== undefined) el.placeholder = T[lang][key];
+    });
+
+    const savedName = sessionStorage.getItem('davy60_name');
+    if(savedName) renderWelcome(savedName);
 
     renderItinerary(lang);
     renderPacking(lang);
