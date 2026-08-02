@@ -498,6 +498,36 @@
   .villa-info .villa-loc{ font-size: 12.5px; color: var(--text-faint); margin-bottom: 16px; }
   .villa-info p.desc{ font-size: 14.5px; color: var(--text-dim); font-weight: 300; margin: 0; }
 
+  /* ---------- WHO'S COMING ---------- */
+
+  .whoscoming-section{ background: var(--bg); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .whos-list{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .whos-chip{
+    display:flex;
+    align-items:center;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    padding: 10px 16px 10px 12px;
+    border-radius: 24px;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .whos-chip .whos-dot{
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .whos-status{ margin-top: 18px; font-size: 11.5px; color: var(--text-faint); }
+
   /* ---------- CURRENCY CONVERTER ---------- */
 
   .currency-section{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
@@ -971,7 +1001,6 @@
   @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
 </head>
 <body>
 
@@ -1028,6 +1057,7 @@
     <a href="#top" onclick="toggleNav()" data-i18n="nav.home"></a>
     <a href="#villa-section" onclick="toggleNav()" data-i18n="nav.villa"></a>
     <a href="#villa-rules-section" onclick="toggleNav()" data-i18n="nav.rules"></a>
+    <a href="#whoscoming-section" onclick="toggleNav()" data-i18n="nav.whos"></a>
     <a href="#map-section" onclick="toggleNav()" data-i18n="nav.map"></a>
     <a href="#currency-section" onclick="toggleNav()" data-i18n="nav.currency"></a>
     <a href="#itinerary-section" onclick="toggleNav()" data-i18n="nav.itinerary"></a>
@@ -1060,6 +1090,10 @@
         <a class="tile" href="#villa-rules-section">
           <svg viewBox="0 0 32 32" fill="none"><rect x="6" y="4" width="20" height="24" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M11 11h10M11 16h10M11 21h6" stroke="currentColor" stroke-width="1.6"/></svg>
           <span data-i18n="nav.rules"></span>
+        </a>
+        <a class="tile" href="#whoscoming-section">
+          <svg viewBox="0 0 32 32" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.6"/><circle cx="21" cy="14" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M5 26c0-4 3.1-7 7-7s7 3 7 7M18 26c0-3.2 2.3-5.6 5.5-5.6S27 22.8 27 26" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.whos"></span>
         </a>
         <a class="tile" href="#map-section">
           <svg viewBox="0 0 32 32" fill="none"><path d="M16 5c-4 0-7 3-7 7 0 5 7 15 7 15s7-10 7-15c0-4-3-7-7-7z" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="12" r="2.5" stroke="currentColor" stroke-width="1.6"/></svg>
@@ -1139,6 +1173,19 @@
       <div class="rules-tags" id="rules-tags"></div>
 
       <div class="amenity-grid" id="amenity-grid"></div>
+    </div>
+  </section>
+
+  <section class="whoscoming-section" id="whoscoming-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="whos.eyebrow"></p>
+        <h2 data-i18n="whos.title"></h2>
+        <p data-i18n="whos.sub"></p>
+      </div>
+
+      <div class="whos-list" id="whos-list"></div>
+      <p class="whos-status mono" id="whos-status"></p>
     </div>
   </section>
 
@@ -1429,45 +1476,83 @@
 
   /* ---------------- FIREWORKS BURST ---------------- */
 
-  /* ---------------- FIREWORKS BURST (fireworks-js) ---------------- */
-
-  let fireworksInstance = null;
+  /* ---------------- FIREWORKS BURST (custom canvas) ---------------- */
 
   function launchFireworks(onDone){
     const container = document.getElementById('fireworks-container');
-    if(reduceMotion || typeof Fireworks === 'undefined'){ onDone(); return; }
+    if(reduceMotion){ onDone(); return; }
 
+    let canvas = container.querySelector('canvas');
+    if(!canvas){
+      canvas = document.createElement('canvas');
+      container.appendChild(canvas);
+    }
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = window.innerWidth;
+    let h = canvas.height = window.innerHeight;
     container.classList.add('active');
 
-    if(!fireworksInstance){
-      fireworksInstance = new Fireworks.default(container, {
-        hue: { min: 30, max: 40 },
-        rocketsPoint: { min: 40, max: 60 },
-        opacity: 0.5,
-        acceleration: 1.02,
-        friction: 0.96,
-        gravity: 1.2,
-        particles: 40,
-        traceLength: 3,
-        traceSpeed: 6,
-        explosion: 4,
-        intensity: 8,
-        flickering: 30,
-        lineStyle: 'round',
-        autoresize: true,
-        brightness: { min: 60, max: 80 },
-        decay: { min: 0.015, max: 0.03 },
-        mouse: { click: false, move: false, max: 1 }
-      });
+    const palette = ['#cfa53d', '#e4694a', '#f3eee2', '#e8a13c'];
+    let particles = [];
+    const maxOpacity = 0.55;
+
+    function burst(x, y){
+      const count = 20;
+      const color = palette[Math.floor(Math.random() * palette.length)];
+      for(let i = 0; i < count; i++){
+        const angle = (Math.PI * 2 * i) / count;
+        const speed = 1.2 + Math.random() * 2;
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 1,
+          decay: 0.016 + Math.random() * 0.014,
+          color,
+          r: 1 + Math.random() * 1
+        });
+      }
     }
 
-    fireworksInstance.start();
+    // a few gentle, well-spaced bursts rather than a dense show
+    const burstPoints = [
+      [0.5, 0.32], [0.28, 0.42], [0.72, 0.38]
+    ];
+    burstPoints.forEach((pt, i) => {
+      setTimeout(() => burst(w * pt[0], h * pt[1]), i * 550);
+    });
 
-    setTimeout(() => {
-      fireworksInstance.stop();
-      container.classList.remove('active');
-      onDone();
-    }, 2600);
+    let frame = 0;
+    const maxFrames = 220;
+
+    function tick(){
+      frame++;
+      ctx.clearRect(0, 0, w, h);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.045; // gravity
+        p.life -= p.decay;
+        if(p.life > 0){
+          ctx.beginPath();
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(p.life, 0) * maxOpacity;
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+      ctx.globalAlpha = 1;
+      particles = particles.filter(p => p.life > 0);
+
+      if(frame < maxFrames){
+        requestAnimationFrame(tick);
+      } else {
+        container.classList.remove('active');
+        setTimeout(() => { ctx.clearRect(0,0,w,h); }, 400);
+        onDone();
+      }
+    }
+    tick();
   }
 
   /* ---------------- PASSWORD GATE ---------------- */
