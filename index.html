@@ -767,33 +767,40 @@
 
   .travel-info{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
 
-  .travel-grid{
+  .travel-card-grid{
     display: grid;
-    grid-template-columns: 1.6fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1px;
     background: var(--panel-line);
     border: 1px solid var(--panel-line);
+    margin-bottom: 2px;
   }
-  @media(max-width: 780px){ .travel-grid{ grid-template-columns: 1fr; } }
+  @media(max-width: 760px){ .travel-card-grid{ grid-template-columns: 1fr; } }
 
-  .travel-col{ background: var(--bg); padding: 32px 30px; }
-  .travel-col ul{ list-style: none; margin:0; padding:0; }
-  .travel-col li{
-    font-size: 14.5px;
-    color: var(--text-dim);
-    font-weight: 300;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--panel-line);
+  .travel-card{
+    background: var(--bg);
+    padding: 26px 28px;
     display:flex;
-    align-items: baseline;
-    gap: 10px;
+    gap: 16px;
+    align-items: flex-start;
   }
-  .travel-col li:last-child{ border-bottom: none; }
-  .travel-col li::before{ content: '·'; color: var(--gold); font-size: 20px; line-height: 0; }
-  .travel-col li strong{ color: var(--text); font-weight: 500; }
+  .travel-card .t-icon{
+    flex-shrink: 0;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: rgba(207,165,61,0.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .travel-card .t-icon svg{ width: 18px; height: 18px; stroke: var(--gold); fill: none; }
+  .travel-card .t-body h4{ font-family:'Fraunces', serif; font-size: 15.5px; font-weight: 500; margin: 0 0 6px; color: var(--text); }
+  .travel-card .t-body p{ font-size: 13.5px; color: var(--text-dim); font-weight: 300; line-height: 1.55; margin:0; }
+  .travel-card .t-body p strong{ color: var(--text); font-weight: 500; }
 
   .plug-card{
     background: var(--bg-deep);
+    border: 1px solid var(--panel-line);
     padding: 32px 26px;
     display:flex;
     flex-direction: column;
@@ -803,7 +810,7 @@
   }
   .plug-card svg{ margin-bottom: 18px; }
   .plug-card .plug-label{ font-size: 13px; color: var(--gold); margin-bottom: 10px; }
-  .plug-card .plug-note{ font-size: 13px; color: var(--text-dim); font-weight: 300; max-width: 26ch; margin:0; }
+  .plug-card .plug-note{ font-size: 13px; color: var(--text-dim); font-weight: 300; max-width: 30ch; margin:0; }
 
   /* ---------- PACKING ---------- */
 
@@ -973,7 +980,7 @@
       <div class="map-block">
         <p class="map-label mono" data-i18n="map.closeup.label"></p>
         <div class="map-frame">
-          <iframe src="https://www.google.com/maps?q=Chaweng+Noi+Beach,+Koh+Samui,+Thailand&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <iframe src="https://www.google.com/maps?q=Village+No.+3,+Bophut+3,+Koh+Samui,+Surat+Thani+84320,+Thailand&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
       </div>
     </div>
@@ -1333,7 +1340,7 @@
       "villas.sub": "After weighing everything up, this is the one — here's a first look while we get the full write-up and photos ready.",
       "villas.photosoon": "Photos coming soon",
       "villas.anushka.tag": "Home for the week",
-      "villas.anushka.loc": "Koh Samui, Thailand",
+      "villas.anushka.loc": "Village No. 3, Bophut 3, Koh Samui, Surat Thani 84320, Thailand",
       "villas.anushka.desc": "Full details on the way — check back soon for the full story on the villa, the rooms, and what makes it special.",
       "villas.linksoon": "Booking link coming soon",
       "itin.eyebrow": "THE PLAN",
@@ -1404,7 +1411,7 @@
       "villas.sub": "Après avoir tout pesé, c'est celle-ci — un premier aperçu en attendant la description complète et les photos.",
       "villas.photosoon": "Photos à venir",
       "villas.anushka.tag": "Notre maison pour la semaine",
-      "villas.anushka.loc": "Koh Samui, Thaïlande",
+      "villas.anushka.loc": "Village No. 3, Bophut 3, Koh Samui, Surat Thani 84320, Thaïlande",
       "villas.anushka.desc": "Détails à venir — revenez bientôt pour découvrir la villa, les chambres, et ce qui la rend spéciale.",
       "villas.linksoon": "Lien de réservation à venir",
       "itin.eyebrow": "LE PROGRAMME",
