@@ -91,6 +91,7 @@
 
   .gate-screen{ display: none; }
   .gate-screen.active{ display: block; }
+  .plusones-hint{ margin-top: 20px; }
 
   #welcome-heading{
     font-size: clamp(22px, 4.5vw, 30px);
@@ -1028,6 +1029,8 @@
     <h1 data-i18n="name.title">What's your name?</h1>
     <p class="hint" data-i18n="name.hint">So we know who's coming.</p>
     <input type="text" id="name-input" data-i18n-placeholder="name.placeholder" placeholder="Your name" autocomplete="off">
+    <p class="hint plusones-hint" data-i18n="name.plusones.hint">Anyone joining you? Partner, kids — separate names with commas.</p>
+    <input type="text" id="plusones-input" data-i18n-placeholder="name.plusones.placeholder" placeholder="e.g. Davy, Jamie" autocomplete="off">
     <button id="name-submit" data-i18n="name.button">Continue</button>
     <div id="name-error"></div>
   </div>
@@ -1399,7 +1402,7 @@
   (function ambientBackground(){
     const canvas = document.getElementById('bg-canvas');
     const ctx = canvas.getContext('2d');
-    let w, h, particles;
+    let w, h, particles, sparkles = [];
 
     function resize(){
       w = canvas.width = window.innerWidth;
@@ -1415,8 +1418,9 @@
         x: Math.random() * w,
         y: Math.random() * h,
         r: 1.8 + Math.random() * 3.2,
-        speed: 0.12 + Math.random() * 0.28,
-        drift: (Math.random() - 0.5) * 0.25,
+        speed: 0.15 + Math.random() * 0.3,
+        angle: Math.random() * Math.PI * 2,
+        angleSpeed: (Math.random() - 0.5) * 0.02,
         alpha: 0.55 + Math.random() * 0.4,
         color: colors[Math.floor(Math.random() * colors.length)],
         twinkle: Math.random() * Math.PI * 2,
@@ -1426,32 +1430,63 @@
 
     particles = Array.from({length: 90}, makeParticle);
 
-    function drawStar(p, alpha){
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.translate(p.x, p.y);
-      ctx.shadowBlur = p.r * 6;
-      ctx.shadowColor = p.color;
-      ctx.fillStyle = p.color;
+    function drawStar(p, alpha, ctxTarget){
+      ctxTarget = ctxTarget || ctx;
+      ctxTarget.save();
+      ctxTarget.globalAlpha = alpha;
+      ctxTarget.translate(p.x, p.y);
+      ctxTarget.shadowBlur = p.r * 6;
+      ctxTarget.shadowColor = p.color;
+      ctxTarget.fillStyle = p.color;
 
       const spike = p.r * 4.2;
       // 4-point sparkle flare
-      ctx.beginPath();
-      ctx.moveTo(0, -spike);
-      ctx.quadraticCurveTo(p.r * 0.5, -p.r * 0.5, spike, 0);
-      ctx.quadraticCurveTo(p.r * 0.5, p.r * 0.5, 0, spike);
-      ctx.quadraticCurveTo(-p.r * 0.5, p.r * 0.5, -spike, 0);
-      ctx.quadraticCurveTo(-p.r * 0.5, -p.r * 0.5, 0, -spike);
-      ctx.closePath();
-      ctx.fill();
+      ctxTarget.beginPath();
+      ctxTarget.moveTo(0, -spike);
+      ctxTarget.quadraticCurveTo(p.r * 0.5, -p.r * 0.5, spike, 0);
+      ctxTarget.quadraticCurveTo(p.r * 0.5, p.r * 0.5, 0, spike);
+      ctxTarget.quadraticCurveTo(-p.r * 0.5, p.r * 0.5, -spike, 0);
+      ctxTarget.quadraticCurveTo(-p.r * 0.5, -p.r * 0.5, 0, -spike);
+      ctxTarget.closePath();
+      ctxTarget.fill();
 
       // bright core
-      ctx.beginPath();
-      ctx.arc(0, 0, p.r * 0.9, 0, Math.PI * 2);
-      ctx.fill();
+      ctxTarget.beginPath();
+      ctxTarget.arc(0, 0, p.r * 0.9, 0, Math.PI * 2);
+      ctxTarget.fill();
 
-      ctx.restore();
+      ctxTarget.restore();
     }
+
+    /* ---- cursor / touch sparkle trail ---- */
+    const sparkleColors = ['#cfa53d', '#e4694a', '#f3eee2', '#ffcf88'];
+    let lastSpawn = 0;
+
+    function spawnSparkles(x, y){
+      const now = performance.now();
+      if(now - lastSpawn < 40) return; // throttle so it doesn't flood on fast movement
+      lastSpawn = now;
+      for(let i = 0; i < 3; i++){
+        sparkles.push({
+          x: x + (Math.random() - 0.5) * 12,
+          y: y + (Math.random() - 0.5) * 12,
+          r: 1 + Math.random() * 1.8,
+          color: sparkleColors[Math.floor(Math.random() * sparkleColors.length)],
+          life: 1,
+          decay: 0.03 + Math.random() * 0.03,
+          vy: -0.3 - Math.random() * 0.4
+        });
+      }
+    }
+
+    function pointFromEvent(e){
+      if(e.touches && e.touches.length) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      return { x: e.clientX, y: e.clientY };
+    }
+
+    window.addEventListener('mousemove', e => spawnSparkles(e.clientX, e.clientY));
+    window.addEventListener('touchmove', e => { const p = pointFromEvent(e); spawnSparkles(p.x, p.y); }, { passive: true });
+    window.addEventListener('touchstart', e => { const p = pointFromEvent(e); spawnSparkles(p.x, p.y); }, { passive: true });
 
     if(reduceMotion){
       particles.forEach(p => drawStar(p, p.alpha));
@@ -1460,14 +1495,30 @@
 
     function tick(){
       ctx.clearRect(0, 0, w, h);
+
       particles.forEach(p => {
-        p.y -= p.speed;
-        p.x += p.drift;
+        p.angle += p.angleSpeed;
+        p.x += Math.cos(p.angle) * p.speed;
+        p.y += Math.sin(p.angle) * p.speed - p.speed * 0.4; // gentle overall upward bias
         p.twinkle += p.twinkleSpeed;
-        if(p.y < -10){ Object.assign(p, makeParticle(), {y: h + 10}); }
+
+        // wrap around all edges rather than only resetting from the bottom
+        if(p.x < -10) p.x = w + 10;
+        if(p.x > w + 10) p.x = -10;
+        if(p.y < -10) p.y = h + 10;
+        if(p.y > h + 10) p.y = -10;
+
         const flicker = 0.5 + Math.sin(p.twinkle) * 0.5;
         drawStar(p, p.alpha * flicker);
       });
+
+      sparkles.forEach(s => {
+        s.y += s.vy;
+        s.life -= s.decay;
+        if(s.life > 0) drawStar(s, Math.max(s.life, 0) * 0.8);
+      });
+      sparkles = sparkles.filter(s => s.life > 0);
+
       ctx.globalAlpha = 1;
       requestAnimationFrame(tick);
     }
@@ -1573,7 +1624,7 @@
     const err = document.getElementById('gate-error');
     if(normalize(val) === PASSWORD){
       err.textContent = '';
-      sessionStorage.setItem('davy60_unlocked', '1');
+      localStorage.setItem('davy60_unlocked', '1');
 
       // Fireworks are a bonus effect — never let them block the flow.
       try{ launchFireworks(() => {}); } catch(e){ /* ignore, purely decorative */ }
@@ -1587,15 +1638,19 @@
 
   function trySubmitName(){
     const nameVal = document.getElementById('name-input').value.trim();
+    const plusOnesRaw = document.getElementById('plusones-input').value.trim();
+    const plusOnes = plusOnesRaw ? plusOnesRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
     const err = document.getElementById('name-error');
     if(!nameVal){
       err.textContent = (currentLang === 'fr') ? "Merci d'indiquer votre prénom." : "Please enter your name.";
       return;
     }
     err.textContent = '';
-    sessionStorage.setItem('davy60_name', nameVal);
+    localStorage.setItem('davy60_name', nameVal);
+    localStorage.setItem('davy60_plusones', JSON.stringify(plusOnes));
     renderWelcome(nameVal);
     showScreen('screen-welcome');
+    addGuestToList(nameVal, plusOnes);
   }
 
   function renderWelcome(name){
@@ -1613,17 +1668,15 @@
   document.getElementById('gate-input').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
   document.getElementById('name-submit').addEventListener('click', trySubmitName);
   document.getElementById('name-input').addEventListener('keydown', e => { if(e.key === 'Enter') trySubmitName(); });
+  document.getElementById('plusones-input').addEventListener('keydown', e => { if(e.key === 'Enter') trySubmitName(); });
   document.getElementById('welcome-continue').addEventListener('click', enterSite);
 
-  if(sessionStorage.getItem('davy60_unlocked') === '1'){
-    const savedName = sessionStorage.getItem('davy60_name');
-    if(savedName){
-      document.getElementById('gate').style.display = 'none';
-      document.getElementById('site').classList.add('unlocked');
-    }
-    // If the password was entered but the name step wasn't completed, fall through
-    // to the normal gate flow rather than silently skipping the name screen.
+  if(localStorage.getItem('davy60_unlocked') === '1' && localStorage.getItem('davy60_name')){
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('site').classList.add('unlocked');
   }
+  // If the password was entered but the name step wasn't completed on a past visit,
+  // fall through to the normal gate flow rather than silently skipping the name screen.
 
   /* ---------------- TRANSLATIONS ---------------- */
 
@@ -1640,6 +1693,8 @@
       "name.title": "What's your name?",
       "name.hint": "So we know who's coming.",
       "name.button": "Continue",
+      "name.plusones.hint": "Anyone joining you? Partner, kids — separate names with commas.",
+      "name.plusones.placeholder": "e.g. Davy, Jamie",
       "welcome.eyebrow": "YOU'RE IN",
       "welcome.heading": "Hello {name}, we're so happy you're coming to Thailand to celebrate Davy's 60th with us. Here's everything you'll need to get there.",
       "welcome.button": "Let's go",
@@ -1678,6 +1733,10 @@
       "nav.home": "Home",
       "nav.villa": "The Villa",
       "nav.rules": "In the Villa",
+      "nav.whos": "Who's Coming",
+      "whos.eyebrow": "THE GUEST LIST",
+      "whos.title": "Who's coming",
+      "whos.sub": "Everyone who's checked in so far — say hi to a familiar face before you even land.",
       "nav.map": "Map",
       "nav.currency": "Currency",
       "currency.eyebrow": "MONEY MATTERS",
@@ -1734,6 +1793,8 @@
       "name.title": "Quel est votre prénom ?",
       "name.hint": "Pour savoir qui vient.",
       "name.button": "Continuer",
+      "name.plusones.hint": "Quelqu'un vous accompagne ? Conjoint, enfants — séparez les noms par des virgules.",
+      "name.plusones.placeholder": "ex. Davy, Jamie",
       "welcome.eyebrow": "C'EST BON",
       "welcome.heading": "Bonjour {name}, nous sommes tellement heureux que vous veniez en Thaïlande pour célébrer les 60 ans de Davy avec nous. Voici tout ce dont vous aurez besoin pour y arriver.",
       "welcome.button": "C'est parti",
@@ -1772,6 +1833,10 @@
       "nav.home": "Accueil",
       "nav.villa": "La Villa",
       "nav.rules": "Dans la villa",
+      "nav.whos": "Qui vient",
+      "whos.eyebrow": "LA LISTE DES INVITÉS",
+      "whos.title": "Qui vient",
+      "whos.sub": "Tous ceux qui se sont déjà inscrits — repérez un visage familier avant même d'atterrir.",
       "nav.map": "Carte",
       "nav.currency": "Devises",
       "currency.eyebrow": "CÔTÉ FINANCES",
@@ -2040,8 +2105,9 @@
       if(T[lang][key] !== undefined) el.placeholder = T[lang][key];
     });
 
-    const savedName = sessionStorage.getItem('davy60_name');
+    const savedName = localStorage.getItem('davy60_name');
     if(savedName) renderWelcome(savedName);
+    renderWhosComing();
 
     renderItinerary(lang);
     renderPacking(lang);
@@ -2144,6 +2210,66 @@
   }
 
   document.getElementById('thb-input').addEventListener('input', updateCurrencyOutputs);
+  /* ---------------- WHO'S COMING (shared guest list via jsonblob) ---------------- */
+
+  const GUESTLIST_URL = 'https://jsonblob.com/api/jsonBlob/019fc35e-26bf-7312-a9ce-000e0ae013fc';
+
+  async function addGuestToList(name, plusOnes){
+    plusOnes = plusOnes || [];
+    try{
+      const res = await fetch(GUESTLIST_URL);
+      const data = await res.json();
+      const guests = Array.isArray(data.guests) ? data.guests : [];
+      const existing = guests.find(g => g.name.toLowerCase() === name.toLowerCase());
+      if(existing){
+        existing.plusOnes = plusOnes;
+      } else {
+        guests.push({ name, plusOnes });
+      }
+      await fetch(GUESTLIST_URL, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ guests })
+      });
+      renderWhosComing(guests);
+    } catch(e){
+      // Non-critical — the welcome flow already continued regardless.
+    }
+  }
+
+  async function renderWhosComing(guestsArg){
+    const listEl = document.getElementById('whos-list');
+    const statusEl = document.getElementById('whos-status');
+    if(!listEl) return;
+
+    let guests = guestsArg;
+    if(!guests){
+      try{
+        const res = await fetch(GUESTLIST_URL);
+        const data = await res.json();
+        guests = Array.isArray(data.guests) ? data.guests : [];
+      } catch(e){
+        statusEl.textContent = currentLang === 'fr'
+          ? "Impossible de charger la liste pour le moment."
+          : "Couldn't load the list right now.";
+        return;
+      }
+    }
+
+    listEl.innerHTML = guests.map(g => {
+      const extra = (g.plusOnes && g.plusOnes.length) ? ` +${g.plusOnes.length} (${g.plusOnes.join(', ')})` : '';
+      return `<span class="whos-chip"><span class="whos-dot"></span>${g.name}${extra}</span>`;
+    }).join('');
+
+    const totalHeads = guests.reduce((sum, g) => sum + 1 + (g.plusOnes ? g.plusOnes.length : 0), 0);
+    const countLabel = currentLang === 'fr'
+      ? `${guests.length} inscription${guests.length === 1 ? '' : 's'} · ${totalHeads} personne${totalHeads === 1 ? '' : 's'} au total`
+      : `${guests.length} check-in${guests.length === 1 ? '' : 's'} · ${totalHeads} ${totalHeads === 1 ? 'person' : 'people'} total`;
+    statusEl.textContent = countLabel;
+  }
+
+  renderWhosComing();
+
   loadRates();
 
   function openLightbox(src){
