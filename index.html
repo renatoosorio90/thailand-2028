@@ -48,16 +48,15 @@
     mix-blend-mode: screen;
   }
 
-  #fw-canvas{
+  #fireworks-container{
     position: fixed;
     inset: 0;
     z-index: 998;
     pointer-events: none;
     opacity: 0;
     transition: opacity .4s ease;
-    mix-blend-mode: screen;
   }
-  #fw-canvas.active{ opacity: 1; }
+  #fireworks-container.active{ opacity: 1; }
 
   #gate, #site{ position: relative; z-index: 1; }
 
@@ -499,6 +498,57 @@
   .villa-info .villa-loc{ font-size: 12.5px; color: var(--text-faint); margin-bottom: 16px; }
   .villa-info p.desc{ font-size: 14.5px; color: var(--text-dim); font-weight: 300; margin: 0; }
 
+  /* ---------- CURRENCY CONVERTER ---------- */
+
+  .currency-section{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .currency-card{
+    max-width: 480px;
+    background: var(--bg-deep);
+    border: 1px solid var(--panel-line);
+    padding: 32px 30px;
+  }
+
+  .currency-input-row{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+    border: 1px solid var(--panel-line);
+    background: var(--bg);
+    padding: 12px 16px;
+    border-radius: 4px;
+  }
+  .currency-symbol{ font-size: 16px; color: var(--gold); }
+  .currency-input-row input{
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    min-width: 0;
+  }
+  .currency-tag{ font-size: 12px; color: var(--text-faint); }
+
+  .currency-results{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+    margin-top: 20px;
+  }
+  .currency-result{
+    background: var(--panel);
+    padding: 20px;
+    text-align:center;
+  }
+  .cr-value{ display:block; font-size: 22px; color: var(--gold); margin-bottom: 6px; }
+  .cr-label{ font-size: 11px; color: var(--text-faint); letter-spacing: 0.06em; }
+
+  .currency-updated{ font-size: 11px; color: var(--text-faint); margin: 16px 0 0; }
+
   /* ---------- MAP ---------- */
 
   .map-section{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
@@ -921,11 +971,12 @@
   @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.x/dist/index.umd.js"></script>
 </head>
 <body>
 
 <canvas id="bg-canvas"></canvas>
-<canvas id="fw-canvas"></canvas>
+<div id="fireworks-container"></div>
 
 <!-- ============ PASSWORD GATE ============ -->
 <div id="gate">
@@ -978,6 +1029,7 @@
     <a href="#villa-section" onclick="toggleNav()" data-i18n="nav.villa"></a>
     <a href="#villa-rules-section" onclick="toggleNav()" data-i18n="nav.rules"></a>
     <a href="#map-section" onclick="toggleNav()" data-i18n="nav.map"></a>
+    <a href="#currency-section" onclick="toggleNav()" data-i18n="nav.currency"></a>
     <a href="#itinerary-section" onclick="toggleNav()" data-i18n="nav.itinerary"></a>
     <a href="#weather-section" onclick="toggleNav()" data-i18n="nav.weather"></a>
     <a href="#packing-section" onclick="toggleNav()" data-i18n="nav.packing"></a>
@@ -1012,6 +1064,10 @@
         <a class="tile" href="#map-section">
           <svg viewBox="0 0 32 32" fill="none"><path d="M16 5c-4 0-7 3-7 7 0 5 7 15 7 15s7-10 7-15c0-4-3-7-7-7z" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="12" r="2.5" stroke="currentColor" stroke-width="1.6"/></svg>
           <span data-i18n="nav.map"></span>
+        </a>
+        <a class="tile" href="#currency-section">
+          <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="11" stroke="currentColor" stroke-width="1.6"/><path d="M13 12h4a2.5 2.5 0 0 1 0 5h-4a2.5 2.5 0 0 0 0 5h5M16 10v2M16 20v2" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.currency"></span>
         </a>
         <a class="tile" href="#itinerary-section">
           <svg viewBox="0 0 32 32" fill="none"><rect x="6" y="7" width="20" height="19" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M6 13h20M11 4v6M21 4v6" stroke="currentColor" stroke-width="1.6"/></svg>
@@ -1086,6 +1142,37 @@
     </div>
   </section>
 
+  <section class="currency-section" id="currency-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="currency.eyebrow"></p>
+        <h2 data-i18n="currency.title"></h2>
+        <p data-i18n="currency.sub"></p>
+      </div>
+
+      <div class="currency-card">
+        <div class="currency-input-row">
+          <span class="currency-symbol mono">฿</span>
+          <input type="number" id="thb-input" value="1000" min="0" inputmode="decimal">
+          <span class="currency-tag mono">THB</span>
+        </div>
+
+        <div class="currency-results">
+          <div class="currency-result">
+            <span class="cr-value mono" id="eur-output">—</span>
+            <span class="cr-label mono">EUR</span>
+          </div>
+          <div class="currency-result">
+            <span class="cr-value mono" id="gbp-output">—</span>
+            <span class="cr-label mono">GBP</span>
+          </div>
+        </div>
+
+        <p class="currency-updated mono" id="currency-updated"></p>
+      </div>
+    </div>
+  </section>
+
   <section class="map-section" id="map-section">
     <div class="wrap">
       <div class="section-head">
@@ -1104,7 +1191,7 @@
       <div class="map-block">
         <p class="map-label mono" data-i18n="map.closeup.label"></p>
         <div class="map-frame">
-          <iframe src="https://www.google.com/maps?q=Village+No.+3,+Bophut+3,+Koh+Samui,+Surat+Thani+84320,+Thailand&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <iframe src="https://www.google.com/maps?q=Villa+Anushka+Koh+Samui,+82+Ban+Koh+Faan,+53+Village+No.3,+Tambon+Bo+Put,+Amphoe+Ko+Samui,+Surat+Thani+84320,+Thailand&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
       </div>
     </div>
@@ -1342,76 +1429,45 @@
 
   /* ---------------- FIREWORKS BURST ---------------- */
 
+  /* ---------------- FIREWORKS BURST (fireworks-js) ---------------- */
+
+  let fireworksInstance = null;
+
   function launchFireworks(onDone){
-    const canvas = document.getElementById('fw-canvas');
-    if(reduceMotion){ onDone(); return; }
+    const container = document.getElementById('fireworks-container');
+    if(reduceMotion || typeof Fireworks === 'undefined'){ onDone(); return; }
 
-    const ctx = canvas.getContext('2d');
-    let w = canvas.width = window.innerWidth;
-    let h = canvas.height = window.innerHeight;
-    canvas.classList.add('active');
+    container.classList.add('active');
 
-    const palette = ['#cfa53d', '#e4694a', '#f3eee2', '#e8a13c'];
-    let particles = [];
-    const maxOpacity = 0.55;
-
-    function burst(x, y){
-      const count = 20;
-      const color = palette[Math.floor(Math.random() * palette.length)];
-      for(let i = 0; i < count; i++){
-        const angle = (Math.PI * 2 * i) / count;
-        const speed = 1.2 + Math.random() * 2;
-        particles.push({
-          x, y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          life: 1,
-          decay: 0.016 + Math.random() * 0.014,
-          color,
-          r: 1 + Math.random() * 1
-        });
-      }
-    }
-
-    // a few gentle, well-spaced bursts rather than a dense show
-    const burstPoints = [
-      [0.5, 0.32], [0.28, 0.42], [0.72, 0.38]
-    ];
-    burstPoints.forEach((pt, i) => {
-      setTimeout(() => burst(w * pt[0], h * pt[1]), i * 550);
-    });
-
-    let frame = 0;
-    const maxFrames = 220;
-
-    function tick(){
-      frame++;
-      ctx.clearRect(0, 0, w, h);
-      particles.forEach(p => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.045; // gravity
-        p.life -= p.decay;
-        if(p.life > 0){
-          ctx.beginPath();
-          ctx.fillStyle = p.color;
-          ctx.globalAlpha = Math.max(p.life, 0) * maxOpacity;
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fill();
-        }
+    if(!fireworksInstance){
+      fireworksInstance = new Fireworks.default(container, {
+        hue: { min: 30, max: 40 },
+        rocketsPoint: { min: 40, max: 60 },
+        opacity: 0.5,
+        acceleration: 1.02,
+        friction: 0.96,
+        gravity: 1.2,
+        particles: 40,
+        traceLength: 3,
+        traceSpeed: 6,
+        explosion: 4,
+        intensity: 8,
+        flickering: 30,
+        lineStyle: 'round',
+        autoresize: true,
+        brightness: { min: 60, max: 80 },
+        decay: { min: 0.015, max: 0.03 },
+        mouse: { click: false, move: false, max: 1 }
       });
-      ctx.globalAlpha = 1;
-      particles = particles.filter(p => p.life > 0);
-
-      if(frame < maxFrames){
-        requestAnimationFrame(tick);
-      } else {
-        canvas.classList.remove('active');
-        setTimeout(() => { ctx.clearRect(0,0,w,h); }, 400);
-        onDone();
-      }
     }
-    tick();
+
+    fireworksInstance.start();
+
+    setTimeout(() => {
+      fireworksInstance.stop();
+      container.classList.remove('active');
+      onDone();
+    }, 2600);
   }
 
   /* ---------------- PASSWORD GATE ---------------- */
@@ -1508,7 +1564,7 @@
       "villas.sub": "After weighing everything up, this is the one — here's a first look while we get the full write-up and photos ready.",
       "villas.photosoon": "Photos coming soon",
       "villas.anushka.tag": "Home for the week",
-      "villas.anushka.loc": "Village No. 3, Bophut 3, Koh Samui, Surat Thani 84320, Thailand",
+      "villas.anushka.loc": "82, Ban Koh Faan, 53 Village No.3, Tambon Bo Put, Amphoe Ko Samui, Surat Thani 84320, Thailand",
       "villas.anushka.desc": "Full details on the way — check back soon for the full story on the villa, the rooms, and what makes it special.",
       "villas.linksoon": "Booking link coming soon",
       "itin.eyebrow": "THE PLAN",
@@ -1536,6 +1592,10 @@
       "nav.villa": "The Villa",
       "nav.rules": "In the Villa",
       "nav.map": "Map",
+      "nav.currency": "Currency",
+      "currency.eyebrow": "MONEY MATTERS",
+      "currency.title": "Currency converter",
+      "currency.sub": "Live exchange rates, sourced from the European Central Bank.",
       "nav.itinerary": "Itinerary",
       "nav.weather": "Weather",
       "nav.packing": "What to Bring",
@@ -1596,7 +1656,7 @@
       "villas.sub": "Après avoir tout pesé, c'est celle-ci — un premier aperçu en attendant la description complète et les photos.",
       "villas.photosoon": "Photos à venir",
       "villas.anushka.tag": "Notre maison pour la semaine",
-      "villas.anushka.loc": "Village No. 3, Bophut 3, Koh Samui, Surat Thani 84320, Thaïlande",
+      "villas.anushka.loc": "82, Ban Koh Faan, 53 Village No.3, Tambon Bo Put, Amphoe Ko Samui, Surat Thani 84320, Thaïlande",
       "villas.anushka.desc": "Détails à venir — revenez bientôt pour découvrir la villa, les chambres, et ce qui la rend spéciale.",
       "villas.linksoon": "Lien de réservation à venir",
       "itin.eyebrow": "LE PROGRAMME",
@@ -1624,6 +1684,10 @@
       "nav.villa": "La Villa",
       "nav.rules": "Dans la villa",
       "nav.map": "Carte",
+      "nav.currency": "Devises",
+      "currency.eyebrow": "CÔTÉ FINANCES",
+      "currency.title": "Convertisseur de devises",
+      "currency.sub": "Taux de change en direct, fournis par la Banque centrale européenne.",
       "nav.itinerary": "Programme",
       "nav.weather": "Météo",
       "nav.packing": "Quoi emporter",
@@ -1954,6 +2018,37 @@
   }
 
   renderCarousel();
+
+  /* ---------------- CURRENCY CONVERTER (live ECB rates via Frankfurter) ---------------- */
+
+  let thbToEur = null;
+  let thbToGbp = null;
+
+  async function loadRates(){
+    const updatedEl = document.getElementById('currency-updated');
+    try{
+      const res = await fetch('https://api.frankfurter.app/latest?amount=1&from=THB&to=EUR,GBP');
+      const data = await res.json();
+      thbToEur = data.rates.EUR;
+      thbToGbp = data.rates.GBP;
+      const prefix = currentLang === 'fr' ? 'Taux mis à jour : ' : 'Rates updated: ';
+      updatedEl.textContent = prefix + data.date;
+      updateCurrencyOutputs();
+    } catch(e){
+      updatedEl.textContent = currentLang === 'fr'
+        ? "Taux indisponibles pour le moment — réessayez plus tard."
+        : "Rates unavailable right now — try again shortly.";
+    }
+  }
+
+  function updateCurrencyOutputs(){
+    const amount = parseFloat(document.getElementById('thb-input').value) || 0;
+    document.getElementById('eur-output').textContent = (thbToEur !== null) ? '€' + (amount * thbToEur).toFixed(2) : '—';
+    document.getElementById('gbp-output').textContent = (thbToGbp !== null) ? '£' + (amount * thbToGbp).toFixed(2) : '—';
+  }
+
+  document.getElementById('thb-input').addEventListener('input', updateCurrencyOutputs);
+  loadRates();
 
   function openLightbox(src){
     document.getElementById('lightbox-img').src = src;
