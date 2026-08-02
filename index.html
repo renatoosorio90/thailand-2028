@@ -90,6 +90,16 @@
     text-align: center;
   }
 
+  .gate-screen{ display: none; }
+  .gate-screen.active{ display: block; }
+
+  #welcome-heading{
+    font-size: clamp(22px, 4.5vw, 30px);
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 30px;
+  }
+
   .gate-box .eyebrow{
     font-family:'IBM Plex Mono', monospace;
     font-size: 11px;
@@ -113,7 +123,7 @@
     margin-bottom: 30px;
   }
 
-  #gate-input{
+  #gate-input, #name-input{
     width: 100%;
     background: var(--panel);
     border: 1px solid var(--panel-line);
@@ -126,9 +136,9 @@
     text-align: center;
     letter-spacing: 0.04em;
   }
-  #gate-input:focus{ border-color: var(--gold); }
+  #gate-input:focus, #name-input:focus{ border-color: var(--gold); }
 
-  #gate-submit{
+  #gate-submit, #name-submit, #welcome-continue{
     width: 100%;
     margin-top: 14px;
     background: var(--gold);
@@ -144,9 +154,9 @@
     cursor: pointer;
     transition: opacity .15s ease;
   }
-  #gate-submit:hover{ opacity: 0.88; }
+  #gate-submit:hover, #name-submit:hover, #welcome-continue:hover{ opacity: 0.88; }
 
-  #gate-error{
+  #gate-error, #name-error{
     margin-top: 14px;
     font-size: 12.5px;
     color: var(--coral);
@@ -923,13 +933,29 @@
     <button class="lang-btn active" id="gate-lang-en" onclick="setLang('en')">EN</button>
     <button class="lang-btn" id="gate-lang-fr" onclick="setLang('fr')">FR</button>
   </div>
-  <div class="gate-box">
+
+  <div class="gate-box gate-screen active" id="screen-password">
     <p class="eyebrow" data-i18n="gate.eyebrow">PRIVATE INVITATION</p>
     <h1 data-i18n-html="gate.title">You're invited to <em>Davy's 60th</em></h1>
     <p class="hint" data-i18n="gate.hint">Enter the password to open your invitation.</p>
     <input type="password" id="gate-input" placeholder="Password" autocomplete="off">
     <button id="gate-submit" data-i18n="gate.button">Unlock</button>
     <div id="gate-error"></div>
+  </div>
+
+  <div class="gate-box gate-screen" id="screen-name">
+    <p class="eyebrow" data-i18n="name.eyebrow">ALMOST THERE</p>
+    <h1 data-i18n="name.title">What's your name?</h1>
+    <p class="hint" data-i18n="name.hint">So we know who's coming.</p>
+    <input type="text" id="name-input" placeholder="Your name" autocomplete="off">
+    <button id="name-submit" data-i18n="name.button">Continue</button>
+    <div id="name-error"></div>
+  </div>
+
+  <div class="gate-box gate-screen" id="screen-welcome">
+    <p class="eyebrow" data-i18n="welcome.eyebrow">YOU'RE IN</p>
+    <h1 id="welcome-heading"></h1>
+    <button id="welcome-continue" data-i18n="welcome.button">Let's go</button>
   </div>
 </div>
 
@@ -1327,31 +1353,32 @@
 
     const palette = ['#cfa53d', '#e4694a', '#f3eee2', '#e8a13c'];
     let particles = [];
+    const maxOpacity = 0.55;
 
     function burst(x, y){
-      const count = 46;
+      const count = 20;
       const color = palette[Math.floor(Math.random() * palette.length)];
       for(let i = 0; i < count; i++){
         const angle = (Math.PI * 2 * i) / count;
-        const speed = 2 + Math.random() * 3.5;
+        const speed = 1.2 + Math.random() * 2;
         particles.push({
           x, y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           life: 1,
-          decay: 0.012 + Math.random() * 0.012,
+          decay: 0.016 + Math.random() * 0.014,
           color,
-          r: 1.5 + Math.random() * 1.5
+          r: 1 + Math.random() * 1
         });
       }
     }
 
-    // stagger several bursts across the sky
+    // a few gentle, well-spaced bursts rather than a dense show
     const burstPoints = [
-      [0.5, 0.35], [0.25, 0.45], [0.75, 0.4], [0.4, 0.25], [0.6, 0.5]
+      [0.5, 0.32], [0.28, 0.42], [0.72, 0.38]
     ];
     burstPoints.forEach((pt, i) => {
-      setTimeout(() => burst(w * pt[0], h * pt[1]), i * 320);
+      setTimeout(() => burst(w * pt[0], h * pt[1]), i * 550);
     });
 
     let frame = 0;
@@ -1368,7 +1395,7 @@
         if(p.life > 0){
           ctx.beginPath();
           ctx.fillStyle = p.color;
-          ctx.globalAlpha = Math.max(p.life, 0);
+          ctx.globalAlpha = Math.max(p.life, 0) * maxOpacity;
           ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
           ctx.fill();
         }
@@ -1393,7 +1420,12 @@
     return s.trim().toLowerCase().replace(/['’‘]/g, "'").replace(/\s+/g, ' ');
   }
 
-  const PASSWORD = normalize("Davy's 60th");
+  const PASSWORD = normalize("Davy60");
+
+  function showScreen(id){
+    document.querySelectorAll('.gate-screen').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
 
   function tryUnlock(){
     const val = document.getElementById('gate-input').value;
@@ -1401,21 +1433,55 @@
     if(normalize(val) === PASSWORD){
       err.textContent = '';
       sessionStorage.setItem('davy60_unlocked', '1');
-      launchFireworks(() => {
-        document.getElementById('gate').style.display = 'none';
-        document.getElementById('site').classList.add('unlocked');
-      });
+
+      // Fireworks are a bonus effect — never let them block the flow.
+      try{ launchFireworks(() => {}); } catch(e){ /* ignore, purely decorative */ }
+
+      showScreen('screen-name');
+      document.getElementById('name-input').focus();
     } else {
       err.textContent = (currentLang === 'fr') ? "Mot de passe incorrect. Réessayez." : "That's not quite it — try again.";
     }
   }
 
-  document.getElementById('gate-submit').addEventListener('click', tryUnlock);
-  document.getElementById('gate-input').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+  function trySubmitName(){
+    const nameVal = document.getElementById('name-input').value.trim();
+    const err = document.getElementById('name-error');
+    if(!nameVal){
+      err.textContent = (currentLang === 'fr') ? "Merci d'indiquer votre prénom." : "Please enter your name.";
+      return;
+    }
+    err.textContent = '';
+    sessionStorage.setItem('davy60_name', nameVal);
+    renderWelcome(nameVal);
+    showScreen('screen-welcome');
+  }
 
-  if(sessionStorage.getItem('davy60_unlocked') === '1'){
+  function renderWelcome(name){
+    const heading = document.getElementById('welcome-heading');
+    const template = T[currentLang]['welcome.heading'];
+    heading.innerHTML = template.replace('{name}', name);
+  }
+
+  function enterSite(){
     document.getElementById('gate').style.display = 'none';
     document.getElementById('site').classList.add('unlocked');
+  }
+
+  document.getElementById('gate-submit').addEventListener('click', tryUnlock);
+  document.getElementById('gate-input').addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+  document.getElementById('name-submit').addEventListener('click', trySubmitName);
+  document.getElementById('name-input').addEventListener('keydown', e => { if(e.key === 'Enter') trySubmitName(); });
+  document.getElementById('welcome-continue').addEventListener('click', enterSite);
+
+  if(sessionStorage.getItem('davy60_unlocked') === '1'){
+    const savedName = sessionStorage.getItem('davy60_name');
+    if(savedName){
+      document.getElementById('gate').style.display = 'none';
+      document.getElementById('site').classList.add('unlocked');
+    }
+    // If the password was entered but the name step wasn't completed, fall through
+    // to the normal gate flow rather than silently skipping the name screen.
   }
 
   /* ---------------- TRANSLATIONS ---------------- */
@@ -1427,6 +1493,13 @@
       "gate.title": "You're invited to <em>Davy's 60th</em>",
       "gate.hint": "Enter the password to open your invitation.",
       "gate.button": "Unlock",
+      "name.eyebrow": "ALMOST THERE",
+      "name.title": "What's your name?",
+      "name.hint": "So we know who's coming.",
+      "name.button": "Continue",
+      "welcome.eyebrow": "YOU'RE IN",
+      "welcome.heading": "Hello {name}, we're so happy you're coming to Thailand to celebrate Davy's 60th with us. Here's everything you'll need to get there.",
+      "welcome.button": "Let's go",
       "hero.title": "Davy's turning <em>60</em>, in Thailand",
       "hero.dates": "KOH SAMUI · <span style='color:var(--coral)'>29 JANUARY &ndash; 11 FEBRUARY 2028</span>",
       "hero.sub": "Two weeks together on the island, one big birthday in the middle of it. Have a look around and get ready.",
@@ -1508,6 +1581,13 @@
       "gate.title": "Vous êtes invités aux <em>60 ans de Davy</em>",
       "gate.hint": "Entrez le mot de passe pour ouvrir votre invitation.",
       "gate.button": "Déverrouiller",
+      "name.eyebrow": "PRESQUE FINI",
+      "name.title": "Quel est votre prénom ?",
+      "name.hint": "Pour savoir qui vient.",
+      "name.button": "Continuer",
+      "welcome.eyebrow": "C'EST BON",
+      "welcome.heading": "Bonjour {name}, nous sommes tellement heureux que vous veniez en Thaïlande pour célébrer les 60 ans de Davy avec nous. Voici tout ce dont vous aurez besoin pour y arriver.",
+      "welcome.button": "C'est parti",
       "hero.title": "Davy fête ses <em>60 ans</em>, en Thaïlande",
       "hero.dates": "KOH SAMUI · <span style='color:var(--coral)'>DU 29 JANVIER AU 11 FÉVRIER 2028</span>",
       "hero.sub": "Deux semaines ensemble sur l'île, avec un grand anniversaire au milieu. Jetez un œil et préparez-vous.",
