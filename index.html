@@ -500,6 +500,81 @@
   .villa-info .villa-loc{ font-size: 12.5px; color: var(--text-faint); margin-bottom: 16px; }
   .villa-info p.desc{ font-size: 14.5px; color: var(--text-dim); font-weight: 300; margin: 0; }
 
+  /* ---------- FLOATING QUICK MENU ---------- */
+
+  .fab-menu{
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 300;
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 999px;
+    padding: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+  }
+
+  .fab-item{
+    display:flex;
+    align-items:center;
+    height: 44px;
+    width: 44px;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-size: inherit;
+    border-radius: 999px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    overflow: hidden;
+    text-decoration: none;
+    transition: width 0.35s cubic-bezier(0.22,1,0.36,1), background 0.3s ease, color 0.3s ease;
+  }
+  .fab-item:hover{
+    width: 168px;
+    background: rgba(207,165,61,0.14);
+    color: var(--gold);
+  }
+
+  .fab-icon{
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .fab-icon svg{ width:19px; height:19px; }
+
+  .fab-label{
+    white-space: nowrap;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
+    opacity: 0;
+    max-width: 0;
+    transform: translateX(-8px);
+    transition: opacity 0.25s ease, max-width 0.35s ease, transform 0.35s ease;
+  }
+  .fab-item:hover .fab-label{
+    opacity: 1;
+    max-width: 130px;
+    transform: translateX(0);
+  }
+
+  @media(max-width: 600px){
+    .fab-menu{ bottom: 16px; }
+  }
+
   /* ---------- WHO'S COMING ---------- */
 
   .whoscoming-section{ background: var(--bg); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
@@ -771,6 +846,43 @@
     cursor: pointer;
     line-height: 1;
   }
+
+  /* ---------- NEARBY ---------- */
+
+  .nearby-section{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .nearby-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+  }
+  @media(max-width: 860px){ .nearby-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media(max-width: 560px){ .nearby-grid{ grid-template-columns: 1fr; } }
+
+  .nearby-card{ background: var(--bg-deep); padding: 26px 24px; }
+  .nearby-card .nearby-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--coral);
+    margin-bottom: 10px;
+    display:block;
+  }
+  .nearby-card h4{ font-family:'Fraunces', serif; font-size: 17px; font-weight: 500; margin: 0 0 8px; }
+  .nearby-card p{ font-size: 13.5px; color: var(--text-dim); font-weight: 300; line-height: 1.6; margin: 0 0 14px; }
+  .nearby-card a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-bottom: 1px solid var(--panel-line);
+    padding-bottom: 2px;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .nearby-card a:hover{ color: var(--gold); border-color: var(--gold); }
 
   /* ---------- ITINERARY ---------- */
 
@@ -1046,6 +1158,25 @@
 <!-- ============ SITE ============ -->
 <div id="site">
 
+  <nav class="fab-menu">
+    <a href="#top" class="fab-item">
+      <span class="fab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
+      <span class="fab-label" data-i18n="fab.top"></span>
+    </a>
+    <button onclick="toggleFabLang()" class="fab-item">
+      <span class="fab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9s-1.3 6.5-3.8 9c-2.5-2.5-3.8-5.7-3.8-9S9.5 5.5 12 3z"/></svg></span>
+      <span class="fab-label" id="fab-lang-label"></span>
+    </button>
+    <a href="#currency-section" class="fab-item">
+      <span class="fab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.5 8.5h3a2 2 0 0 1 0 4h-3a2 2 0 0 0 0 4h4M12 6.5v1.2M12 16.3v1.2"/></svg></span>
+      <span class="fab-label" data-i18n="fab.currency"></span>
+    </a>
+    <button onclick="toggleNav()" class="fab-item">
+      <span class="fab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg></span>
+      <span class="fab-label" data-i18n="fab.menu"></span>
+    </button>
+  </nav>
+
   <div class="topbar">
     <button class="hamburger" id="hamburger-btn" onclick="toggleNav()">
       <span></span><span></span><span></span>
@@ -1065,6 +1196,7 @@
     <a href="#map-section" onclick="toggleNav()" data-i18n="nav.map"></a>
     <a href="#currency-section" onclick="toggleNav()" data-i18n="nav.currency"></a>
     <a href="#itinerary-section" onclick="toggleNav()" data-i18n="nav.itinerary"></a>
+    <a href="#nearby-section" onclick="toggleNav()" data-i18n="nav.nearby"></a>
     <a href="#weather-section" onclick="toggleNav()" data-i18n="nav.weather"></a>
     <a href="#packing-section" onclick="toggleNav()" data-i18n="nav.packing"></a>
     <a href="#travel-info-section" onclick="toggleNav()" data-i18n="nav.travelinfo"></a>
@@ -1110,6 +1242,10 @@
         <a class="tile" href="#itinerary-section">
           <svg viewBox="0 0 32 32" fill="none"><rect x="6" y="7" width="20" height="19" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M6 13h20M11 4v6M21 4v6" stroke="currentColor" stroke-width="1.6"/></svg>
           <span data-i18n="nav.itinerary"></span>
+        </a>
+        <a class="tile" href="#nearby-section">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M16 4c-5 0-9 3.8-9 9 0 6.5 9 15 9 15s9-8.5 9-15c0-5.2-4-9-9-9z" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="13" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.nearby"></span>
         </a>
         <a class="tile" href="#weather-section">
           <svg viewBox="0 0 32 32" fill="none"><circle cx="14" cy="14" r="6" stroke="currentColor" stroke-width="1.6"/><path d="M20 20c3 0 5.5-2.2 5.5-5s-2.2-5-5-5" stroke="currentColor" stroke-width="1.6"/></svg>
@@ -1262,6 +1398,18 @@
       </div>
 
       <div id="itin-days"></div>
+    </div>
+  </section>
+
+  <section class="nearby-section" id="nearby-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="nearby.eyebrow"></p>
+        <h2 data-i18n="nearby.title"></h2>
+        <p data-i18n="nearby.sub"></p>
+      </div>
+
+      <div class="nearby-grid" id="nearby-grid"></div>
     </div>
   </section>
 
@@ -1744,6 +1892,10 @@
       "currency.title": "Currency converter",
       "currency.sub": "Live exchange rates, sourced from the European Central Bank.",
       "nav.itinerary": "Itinerary",
+      "nav.nearby": "Nearby",
+      "nearby.eyebrow": "WORTH THE TRIP",
+      "nearby.title": "Things to do nearby",
+      "nearby.sub": "A few well-loved spots close to the villa, for the open days on the itinerary.",
       "nav.weather": "Weather",
       "nav.packing": "What to Bring",
       "nav.travelinfo": "Before You Travel",
@@ -1780,6 +1932,10 @@
       "map.sub": "Both maps below are fully interactive — zoom, pan, and explore just like normal Google Maps.",
       "map.overview.label": "THAILAND OVERVIEW — BANGKOK TO KOH SAMUI",
       "map.closeup.label": "CHAWENG NOI BEACH — THE VILLA IS RIGHT HERE",
+      "fab.top": "Back to top",
+      "fab.whatsapp": "Message Renato",
+      "fab.currency": "Currency",
+      "fab.menu": "Menu",
       "footer.text": "SEE YOU IN THAILAND · DAVY'S 60TH · 29 JAN – 11 FEB 2028"
     },
     fr: {
@@ -1844,6 +2000,10 @@
       "currency.title": "Convertisseur de devises",
       "currency.sub": "Taux de change en direct, fournis par la Banque centrale européenne.",
       "nav.itinerary": "Programme",
+      "nav.nearby": "À proximité",
+      "nearby.eyebrow": "ÇA VAUT LE DÉTOUR",
+      "nearby.title": "À faire aux alentours",
+      "nearby.sub": "Quelques endroits appréciés près de la villa, pour les journées libres du programme.",
       "nav.weather": "Météo",
       "nav.packing": "Quoi emporter",
       "nav.travelinfo": "Avant de partir",
@@ -1880,6 +2040,10 @@
       "map.sub": "Les deux cartes ci-dessous sont entièrement interactives — zoomez, déplacez-vous, explorez comme sur Google Maps normalement.",
       "map.overview.label": "APERÇU DE LA THAÏLANDE — BANGKOK À KOH SAMUI",
       "map.closeup.label": "PLAGE DE CHAWENG NOI — LA VILLA EST JUSTE ICI",
+      "fab.top": "Haut de page",
+      "fab.whatsapp": "Écrire à Renato",
+      "fab.currency": "Devises",
+      "fab.menu": "Menu",
       "footer.text": "RENDEZ-VOUS EN THAÏLANDE · 60 ANS DE DAVY · 29 JAN – 11 FÉV 2028"
     }
   };
@@ -2092,6 +2256,8 @@
     document.getElementById('lang-fr').classList.toggle('active', lang === 'fr');
     document.getElementById('gate-lang-en').classList.toggle('active', lang === 'en');
     document.getElementById('gate-lang-fr').classList.toggle('active', lang === 'fr');
+    const fabLabel = document.getElementById('fab-lang-label');
+    if(fabLabel) fabLabel.textContent = lang === 'en' ? 'Français' : 'English';
 
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
@@ -2114,6 +2280,7 @@
     renderPacking(lang);
     renderTravelInfo(lang);
     renderRules(lang);
+    renderNearby(lang);
     updateMailtoLink(lang);
   }
 
@@ -2129,6 +2296,45 @@
   setLang('en');
 
   /* ---------------- HAMBURGER NAV ---------------- */
+
+  function toggleFabLang(){
+    setLang(currentLang === 'en' ? 'fr' : 'en');
+  }
+
+  const NEARBY = {
+    en: [
+      {tag:"Half-day", name:"Butterfly Hill", desc:"Landscaped hillside gardens full of colourful butterflies, with a short walk to a nearby waterfall to cool off. A calmer, easy half-day.", link:"https://www.google.com/maps/search/Butterfly+Hill+Koh+Samui"},
+      {tag:"Food & shops", name:"Fisherman's Village", desc:"Bophut's old fishing-village shophouses, now full of restaurants, bars, and boutique shops. A big walking-street night market runs every Friday.", link:"https://www.google.com/maps/search/Fisherman's+Village+Bophut"},
+      {tag:"Evening", name:"Lamai Night Market", desc:"Street food stalls and market browsing in Lamai — a good, casual dinner option with a proper night-market atmosphere.", link:"https://www.google.com/maps/search/Lamai+Night+Market+Koh+Samui"},
+      {tag:"Beach", name:"Silver Beach", desc:"Also called Thongtakian — one of the prettiest, quietest stretches of white sand on the island, away from the bigger crowds.", link:"https://www.google.com/maps/search/Silver+Beach+Thongtakian+Koh+Samui"},
+      {tag:"Beach", name:"Lamai Beach", desc:"The island's second most popular beach, known for the granite rock formations nicknamed Grandmother and Grandfather Rocks.", link:"https://www.google.com/maps/search/Lamai+Beach+Koh+Samui"},
+      {tag:"Temple", name:"Big Buddha Temple", desc:"Wat Phra Yai — the golden seated Buddha watching over the island, one of Koh Samui's most-visited landmarks.", link:"https://www.google.com/maps/search/Wat+Phra+Yai+Big+Buddha+Koh+Samui"},
+      {tag:"Temple", name:"Wat Plai Laem", desc:"A striking temple with a large multi-armed Guanyin statue and a laughing Buddha — very photogenic, worth the short visit.", link:"https://www.google.com/maps/search/Wat+Plai+Laem+Koh+Samui"}
+    ],
+    fr: [
+      {tag:"Demi-journée", name:"Butterfly Hill", desc:"Jardins aménagés à flanc de colline, pleins de papillons colorés, avec une courte marche jusqu'à une cascade voisine. Une demi-journée calme et facile.", link:"https://www.google.com/maps/search/Butterfly+Hill+Koh+Samui"},
+      {tag:"Restos & boutiques", name:"Fisherman's Village", desc:"Les anciennes maisons de pêcheurs de Bophut, aujourd'hui pleines de restaurants, bars et boutiques. Un grand marché nocturne a lieu tous les vendredis.", link:"https://www.google.com/maps/search/Fisherman's+Village+Bophut"},
+      {tag:"Soirée", name:"Marché de nuit de Lamai", desc:"Stands de street food et marché à Lamai — une option de dîner décontractée avec une vraie ambiance de marché nocturne.", link:"https://www.google.com/maps/search/Lamai+Night+Market+Koh+Samui"},
+      {tag:"Plage", name:"Silver Beach", desc:"Aussi appelée Thongtakian — l'une des plus belles plages de l'île, calme et peu fréquentée, avec du sable blanc immaculé.", link:"https://www.google.com/maps/search/Silver+Beach+Thongtakian+Koh+Samui"},
+      {tag:"Plage", name:"Lamai Beach", desc:"La deuxième plage la plus populaire de l'île, connue pour ses formations rocheuses granitiques surnommées les rochers Grand-mère et Grand-père.", link:"https://www.google.com/maps/search/Lamai+Beach+Koh+Samui"},
+      {tag:"Temple", name:"Big Buddha Temple", desc:"Wat Phra Yai — le grand Bouddha doré assis qui veille sur l'île, l'un des sites les plus visités de Koh Samui.", link:"https://www.google.com/maps/search/Wat+Phra+Yai+Big+Buddha+Koh+Samui"},
+      {tag:"Temple", name:"Wat Plai Laem", desc:"Un temple spectaculaire avec une grande statue de Guanyin aux bras multiples et un bouddha rieur — très photogénique, la visite vaut le détour.", link:"https://www.google.com/maps/search/Wat+Plai+Laem+Koh+Samui"}
+    ]
+  };
+
+  function renderNearby(lang){
+    const grid = document.getElementById('nearby-grid');
+    if(!grid) return;
+    const linkLabel = lang === 'fr' ? 'Voir sur la carte' : 'View on map';
+    grid.innerHTML = NEARBY[lang].map(item => `
+      <div class="nearby-card">
+        <span class="nearby-tag">${item.tag}</span>
+        <h4>${item.name}</h4>
+        <p>${item.desc}</p>
+        <a href="${item.link}" target="_blank" rel="noopener">${linkLabel} ↗</a>
+      </div>
+    `).join('');
+  }
 
   function toggleNav(){
     document.getElementById('nav-overlay').classList.toggle('open');
