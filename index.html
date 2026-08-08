@@ -2293,14 +2293,6 @@
     if(link) link.href = `mailto:nado90@me.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }
 
-  setLang('en');
-
-  /* ---------------- HAMBURGER NAV ---------------- */
-
-  function toggleFabLang(){
-    setLang(currentLang === 'en' ? 'fr' : 'en');
-  }
-
   const NEARBY = {
     en: [
       {tag:"Half-day", name:"Butterfly Hill", desc:"Landscaped hillside gardens full of colourful butterflies, with a short walk to a nearby waterfall to cool off. A calmer, easy half-day.", link:"https://www.google.com/maps/search/Butterfly+Hill+Koh+Samui"},
@@ -2334,6 +2326,14 @@
         <a href="${item.link}" target="_blank" rel="noopener">${linkLabel} ↗</a>
       </div>
     `).join('');
+  }
+
+  setLang('en');
+
+  /* ---------------- HAMBURGER NAV ---------------- */
+
+  function toggleFabLang(){
+    setLang(currentLang === 'en' ? 'fr' : 'en');
   }
 
   function toggleNav(){
