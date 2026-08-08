@@ -680,6 +680,14 @@
     border: 0;
   }
 
+  .map-frame-pair{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .map-frame-pair .map-frame{ aspect-ratio: 4 / 3; }
+  @media(max-width: 640px){ .map-frame-pair{ grid-template-columns: 1fr; } }
+
   /* ---------- MENU TILES ---------- */
 
   .menu-tiles{
@@ -846,6 +854,77 @@
     cursor: pointer;
     line-height: 1;
   }
+
+  /* ---------- OPTIONAL EXTRAS ---------- */
+
+  .extras-section{ background: var(--panel); border-top: 1px solid var(--panel-line); border-bottom: 1px solid var(--panel-line); }
+
+  .extras-grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--panel-line);
+    border: 1px solid var(--panel-line);
+  }
+  @media(max-width: 720px){ .extras-grid{ grid-template-columns: 1fr; } }
+
+  .extras-card{ background: var(--bg-deep); padding: 30px 28px; }
+  .extras-card .extras-tag{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--coral);
+    border: 1px solid var(--coral);
+    padding: 4px 9px;
+    border-radius: 3px;
+    margin-bottom: 16px;
+  }
+  .extras-card h3{ font-size: 21px; font-weight: 500; margin: 0 0 10px; }
+  .extras-price{ font-size: 20px; color: var(--gold); margin: 0 0 2px; }
+  .extras-price span{ font-size: 12px; color: var(--text-faint); }
+  .extras-price-sub{ font-size: 11px; color: var(--text-faint); margin: 0 0 14px; }
+  .extras-desc{ font-size: 14px; color: var(--text-dim); font-weight: 300; line-height: 1.6; margin: 0 0 22px; }
+
+  .extras-rsvp-row{
+    display:flex;
+    align-items:center;
+    gap: 14px;
+    border-top: 1px solid var(--panel-line);
+    padding-top: 18px;
+  }
+
+  .extras-rsvp{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 9px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .extras-rsvp:hover{ background: rgba(207,165,61,0.12); }
+  .extras-rsvp.joined{ background: var(--gold); color: var(--bg-deep); }
+
+  .extras-count{ font-size: 12px; color: var(--text-faint); }
+
+  .extras-payment{
+    margin-top: 32px;
+    font-size: 13.5px;
+    color: var(--text-dim);
+    font-weight: 300;
+    line-height: 1.7;
+    padding: 20px 22px;
+    background: var(--bg-deep);
+    border-left: 2px solid var(--gold);
+    max-width: 70ch;
+  }
+  .extras-payment strong{ color: var(--text); font-weight: 500; }
 
   /* ---------- NEARBY ---------- */
 
@@ -1197,6 +1276,7 @@
     <a href="#currency-section" onclick="toggleNav()" data-i18n="nav.currency"></a>
     <a href="#itinerary-section" onclick="toggleNav()" data-i18n="nav.itinerary"></a>
     <a href="#nearby-section" onclick="toggleNav()" data-i18n="nav.nearby"></a>
+    <a href="#extras-section" onclick="toggleNav()" data-i18n="nav.extras"></a>
     <a href="#weather-section" onclick="toggleNav()" data-i18n="nav.weather"></a>
     <a href="#packing-section" onclick="toggleNav()" data-i18n="nav.packing"></a>
     <a href="#travel-info-section" onclick="toggleNav()" data-i18n="nav.travelinfo"></a>
@@ -1246,6 +1326,10 @@
         <a class="tile" href="#nearby-section">
           <svg viewBox="0 0 32 32" fill="none"><path d="M16 4c-5 0-9 3.8-9 9 0 6.5 9 15 9 15s9-8.5 9-15c0-5.2-4-9-9-9z" stroke="currentColor" stroke-width="1.6"/><circle cx="16" cy="13" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
           <span data-i18n="nav.nearby"></span>
+        </a>
+        <a class="tile" href="#extras-section">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M6 12h20l-2 14H8z" stroke="currentColor" stroke-width="1.6"/><path d="M11 12a5 5 0 0 1 10 0" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span data-i18n="nav.extras"></span>
         </a>
         <a class="tile" href="#weather-section">
           <svg viewBox="0 0 32 32" fill="none"><circle cx="14" cy="14" r="6" stroke="currentColor" stroke-width="1.6"/><path d="M20 20c3 0 5.5-2.2 5.5-5s-2.2-5-5-5" stroke="currentColor" stroke-width="1.6"/></svg>
@@ -1370,8 +1454,13 @@
 
       <div class="map-block">
         <p class="map-label mono" data-i18n="map.overview.label"></p>
-        <div class="map-frame">
-          <iframe src="https://www.google.com/maps?saddr=Bangkok,+Thailand&daddr=Koh+Samui,+Thailand&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <div class="map-frame-pair">
+          <div class="map-frame">
+            <iframe src="https://www.google.com/maps?q=Bangkok,+Thailand&z=10&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+          <div class="map-frame">
+            <iframe src="https://www.google.com/maps?q=Koh+Samui,+Thailand&z=10&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
         </div>
       </div>
 
@@ -1410,6 +1499,49 @@
       </div>
 
       <div class="nearby-grid" id="nearby-grid"></div>
+    </div>
+  </section>
+
+  <section class="extras-section" id="extras-section">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow" data-i18n="extras.eyebrow"></p>
+        <h2 data-i18n="extras.title"></h2>
+        <p data-i18n="extras.sub"></p>
+      </div>
+
+      <div class="extras-grid">
+
+        <div class="extras-card">
+          <span class="extras-tag" data-i18n="extras.elephant.tag"></span>
+          <h3 data-i18n="extras.elephant.name"></h3>
+          <p class="extras-price mono">฿3,000 <span data-i18n="extras.perperson"></span></p>
+          <p class="extras-desc" data-i18n="extras.elephant.desc"></p>
+          <div class="extras-rsvp-row">
+            <button class="extras-rsvp" data-activity="elephant" onclick="toggleExtraRSVP(this)">
+              <span data-i18n="extras.rsvp"></span>
+            </button>
+            <span class="extras-count mono" data-extra-count="elephant">–</span>
+          </div>
+        </div>
+
+        <div class="extras-card">
+          <span class="extras-tag" data-i18n="extras.boat.tag"></span>
+          <h3 data-i18n="extras.boat.name"></h3>
+          <p class="extras-price mono">~฿2,900 <span data-i18n="extras.perperson"></span></p>
+          <p class="extras-price-sub mono" data-i18n="extras.boat.priceNote"></p>
+          <p class="extras-desc" data-i18n="extras.boat.desc"></p>
+          <div class="extras-rsvp-row">
+            <button class="extras-rsvp" data-activity="boat" onclick="toggleExtraRSVP(this)">
+              <span data-i18n="extras.rsvp"></span>
+            </button>
+            <span class="extras-count mono" data-extra-count="boat">–</span>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="extras-payment" data-i18n-html="extras.payment"></p>
     </div>
   </section>
 
@@ -1893,6 +2025,20 @@
       "currency.sub": "Live exchange rates, sourced from the European Central Bank.",
       "nav.itinerary": "Itinerary",
       "nav.nearby": "Nearby",
+      "nav.extras": "Optional Extras",
+      "extras.eyebrow": "IF YOU'D LIKE TO JOIN",
+      "extras.title": "Optional extras",
+      "extras.sub": "A couple of things we're organising that aren't part of the main plan — totally optional, join if you'd like to.",
+      "extras.perperson": "per person",
+      "extras.rsvp": "I'm in",
+      "extras.elephant.tag": "Half-day",
+      "extras.elephant.name": "Elephant Sanctuary Visit",
+      "extras.elephant.desc": "An ethical, hands-off sanctuary visit — feeding and observing the elephants rather than riding them.",
+      "extras.boat.tag": "Evening",
+      "extras.boat.name": "Sunset Boat Trip",
+      "extras.boat.priceNote": "Approximate — final price confirmed closer to the date",
+      "extras.boat.desc": "An evening on the water watching the sun go down over the coast.",
+      "extras.payment": "If you'd like to join either of these, tap <strong>\"I'm in\"</strong> so we can book the right numbers. No rush on payment — you can settle up before the trip or once we're there, whichever's easier. Bank details to follow closer to the date.",
       "nearby.eyebrow": "WORTH THE TRIP",
       "nearby.title": "Things to do nearby",
       "nearby.sub": "A few well-loved spots close to the villa, for the open days on the itinerary.",
@@ -1930,7 +2076,7 @@
       "map.eyebrow": "FINDING YOUR WAY",
       "map.title": "Getting your bearings",
       "map.sub": "Both maps below are fully interactive — zoom, pan, and explore just like normal Google Maps.",
-      "map.overview.label": "THAILAND OVERVIEW — BANGKOK TO KOH SAMUI",
+      "map.overview.label": "THAILAND OVERVIEW — BANGKOK & KOH SAMUI",
       "map.closeup.label": "CHAWENG NOI BEACH — THE VILLA IS RIGHT HERE",
       "fab.top": "Back to top",
       "fab.whatsapp": "Message Renato",
@@ -2001,6 +2147,20 @@
       "currency.sub": "Taux de change en direct, fournis par la Banque centrale européenne.",
       "nav.itinerary": "Programme",
       "nav.nearby": "À proximité",
+      "nav.extras": "Extras optionnels",
+      "extras.eyebrow": "SI VOUS VOULEZ VOUS JOINDRE",
+      "extras.title": "Extras optionnels",
+      "extras.sub": "Quelques activités que nous organisons en dehors du programme principal — totalement optionnelles, à vous de voir.",
+      "extras.perperson": "par personne",
+      "extras.rsvp": "Je participe",
+      "extras.elephant.tag": "Demi-journée",
+      "extras.elephant.name": "Visite du sanctuaire d'éléphants",
+      "extras.elephant.desc": "Une visite éthique et sans contact forcé — on nourrit et observe les éléphants plutôt que de les monter.",
+      "extras.boat.tag": "Soirée",
+      "extras.boat.name": "Croisière au coucher du soleil",
+      "extras.boat.priceNote": "Prix approximatif — confirmé plus près de la date",
+      "extras.boat.desc": "Une soirée sur l'eau à regarder le soleil se coucher sur la côte.",
+      "extras.payment": "Si vous voulez vous joindre à l'une de ces activités, appuyez sur <strong>« Je participe »</strong> pour qu'on puisse réserver le bon nombre de places. Pas de précipitation pour le paiement — vous pouvez régler avant le voyage ou une fois sur place, comme vous préférez. Coordonnées bancaires à venir plus près de la date.",
       "nearby.eyebrow": "ÇA VAUT LE DÉTOUR",
       "nearby.title": "À faire aux alentours",
       "nearby.sub": "Quelques endroits appréciés près de la villa, pour les journées libres du programme.",
@@ -2038,7 +2198,7 @@
       "map.eyebrow": "SE REPÉRER",
       "map.title": "Se repérer sur la carte",
       "map.sub": "Les deux cartes ci-dessous sont entièrement interactives — zoomez, déplacez-vous, explorez comme sur Google Maps normalement.",
-      "map.overview.label": "APERÇU DE LA THAÏLANDE — BANGKOK À KOH SAMUI",
+      "map.overview.label": "APERÇU DE LA THAÏLANDE — BANGKOK & KOH SAMUI",
       "map.closeup.label": "PLAGE DE CHAWENG NOI — LA VILLA EST JUSTE ICI",
       "fab.top": "Haut de page",
       "fab.whatsapp": "Écrire à Renato",
@@ -2295,7 +2455,7 @@
 
   const NEARBY = {
     en: [
-      {tag:"Half-day", name:"Butterfly Hill", desc:"Landscaped hillside gardens full of colourful butterflies, with a short walk to a nearby waterfall to cool off. A calmer, easy half-day.", link:"https://www.google.com/maps/search/Butterfly+Hill+Koh+Samui"},
+      {tag:"Half-day", name:"Tarnim Magic Garden", desc:"Also called the Secret Buddha Garden — a quiet sculpture garden hidden in the hills atop Pom Mountain, built over decades by a local farmer. Moss-covered statues, small waterfalls, jungle paths. Best early morning or late afternoon; a car or 4x4 is needed for the steep road up.", link:"https://www.google.com/maps/search/Tarnim+Magic+Garden+Koh+Samui"},
       {tag:"Food & shops", name:"Fisherman's Village", desc:"Bophut's old fishing-village shophouses, now full of restaurants, bars, and boutique shops. A big walking-street night market runs every Friday.", link:"https://www.google.com/maps/search/Fisherman's+Village+Bophut"},
       {tag:"Evening", name:"Lamai Night Market", desc:"Street food stalls and market browsing in Lamai — a good, casual dinner option with a proper night-market atmosphere.", link:"https://www.google.com/maps/search/Lamai+Night+Market+Koh+Samui"},
       {tag:"Beach", name:"Silver Beach", desc:"Also called Thongtakian — one of the prettiest, quietest stretches of white sand on the island, away from the bigger crowds.", link:"https://www.google.com/maps/search/Silver+Beach+Thongtakian+Koh+Samui"},
@@ -2304,7 +2464,7 @@
       {tag:"Temple", name:"Wat Plai Laem", desc:"A striking temple with a large multi-armed Guanyin statue and a laughing Buddha — very photogenic, worth the short visit.", link:"https://www.google.com/maps/search/Wat+Plai+Laem+Koh+Samui"}
     ],
     fr: [
-      {tag:"Demi-journée", name:"Butterfly Hill", desc:"Jardins aménagés à flanc de colline, pleins de papillons colorés, avec une courte marche jusqu'à une cascade voisine. Une demi-journée calme et facile.", link:"https://www.google.com/maps/search/Butterfly+Hill+Koh+Samui"},
+      {tag:"Demi-journée", name:"Tarnim Magic Garden", desc:"Aussi appelé le Secret Buddha Garden — un jardin de sculptures paisible caché dans les collines au sommet du mont Pom, construit sur des décennies par un fermier local. Statues couvertes de mousse, petites cascades, sentiers dans la jungle. Idéal tôt le matin ou en fin d'après-midi ; une voiture ou un 4x4 est nécessaire pour la route escarpée.", link:"https://www.google.com/maps/search/Tarnim+Magic+Garden+Koh+Samui"},
       {tag:"Restos & boutiques", name:"Fisherman's Village", desc:"Les anciennes maisons de pêcheurs de Bophut, aujourd'hui pleines de restaurants, bars et boutiques. Un grand marché nocturne a lieu tous les vendredis.", link:"https://www.google.com/maps/search/Fisherman's+Village+Bophut"},
       {tag:"Soirée", name:"Marché de nuit de Lamai", desc:"Stands de street food et marché à Lamai — une option de dîner décontractée avec une vraie ambiance de marché nocturne.", link:"https://www.google.com/maps/search/Lamai+Night+Market+Koh+Samui"},
       {tag:"Plage", name:"Silver Beach", desc:"Aussi appelée Thongtakian — l'une des plus belles plages de l'île, calme et peu fréquentée, avec du sable blanc immaculé.", link:"https://www.google.com/maps/search/Silver+Beach+Thongtakian+Koh+Samui"},
@@ -2346,6 +2506,8 @@
   const PHOTO_COUNT = 74;
   let carouselIndex = 0;
   const photoSrcs = Array.from({length: PHOTO_COUNT}, (_, i) => `villa-${String(i+1).padStart(2,'0')}.jpg`);
+  // Show photo 2 as the main/first image, then photo 1, then the rest in order
+  [photoSrcs[0], photoSrcs[1]] = [photoSrcs[1], photoSrcs[0]];
 
   function renderCarousel(){
     const main = document.getElementById('carousel-main');
@@ -2420,6 +2582,63 @@
   /* ---------------- WHO'S COMING (shared guest list via jsonblob) ---------------- */
 
   const GUESTLIST_URL = 'https://jsonblob.com/api/jsonBlob/019fc35e-26bf-7312-a9ce-000e0ae013fc';
+  const EXTRAS_URL = 'https://jsonblob.com/api/jsonBlob/019fe205-d52c-77db-9689-5d171e10b3af';
+
+  async function loadExtrasCounts(){
+    try{
+      const res = await fetch(EXTRAS_URL);
+      const data = await res.json();
+      ['elephant','boat'].forEach(key => {
+        const el = document.querySelector(`[data-extra-count="${key}"]`);
+        const list = data[key] || [];
+        el.textContent = `${list.length} ${list.length === 1 ? 'joining' : 'joining'}`;
+        const btn = document.querySelector(`.extras-rsvp[data-activity="${key}"]`);
+        const myName = localStorage.getItem('davy60_name');
+        if(myName && list.some(n => n.toLowerCase() === myName.toLowerCase())){
+          btn.classList.add('joined');
+        }
+      });
+    } catch(e){
+      // non-critical
+    }
+  }
+
+  async function toggleExtraRSVP(btn){
+    const key = btn.getAttribute('data-activity');
+    const myName = localStorage.getItem('davy60_name');
+    if(!myName){
+      alert(currentLang === 'fr' ? "Merci d'indiquer votre nom d'abord." : "Please enter your name first.");
+      return;
+    }
+    btn.disabled = true;
+    try{
+      const res = await fetch(EXTRAS_URL);
+      const data = await res.json();
+      const list = data[key] || [];
+      const idx = list.findIndex(n => n.toLowerCase() === myName.toLowerCase());
+      if(idx === -1){
+        list.push(myName);
+        btn.classList.add('joined');
+      } else {
+        list.splice(idx, 1);
+        btn.classList.remove('joined');
+      }
+      data[key] = list;
+      await fetch(EXTRAS_URL, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      });
+      const countEl = document.querySelector(`[data-extra-count="${key}"]`);
+      countEl.textContent = `${list.length} joining`;
+    } catch(e){
+      // non-critical
+    }
+    btn.disabled = false;
+  }
+
+  loadExtrasCounts();
+
 
   async function addGuestToList(name, plusOnes){
     plusOnes = plusOnes || [];
