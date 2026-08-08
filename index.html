@@ -63,6 +63,110 @@
 
   /* ============ PASSWORD GATE ============ */
 
+  #secret-gate{
+    position: fixed;
+    inset: 0;
+    z-index: 995;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(ellipse at 50% 20%, #163a3e 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 70%);
+    padding: 24px;
+  }
+  #secret-gate.open{ display:flex; }
+
+  #secret-input, #secret-submit{ width: 100%; }
+  #secret-input{
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 15px;
+    padding: 14px 16px;
+    border-radius: 4px;
+    outline: none;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+  #secret-input:focus{ border-color: var(--gold); }
+  #secret-submit{
+    margin-top: 14px;
+    background: var(--gold);
+    color: var(--bg-deep);
+    border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    padding: 14px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity .15s ease;
+  }
+  #secret-submit:hover{ opacity: 0.88; }
+  #secret-error{
+    margin-top: 14px;
+    font-size: 12.5px;
+    color: var(--coral);
+    font-family: 'IBM Plex Mono', monospace;
+    min-height: 16px;
+  }
+
+  #secret-page{
+    display:none;
+    position: fixed;
+    inset: 0;
+    z-index: 996;
+    background: var(--bg-deep);
+    overflow-y: auto;
+    padding: 80px 0 100px;
+  }
+  #secret-page.open{ display:block; }
+
+  .secret-wrap{ text-align:center; }
+  .secret-wrap .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+  .secret-wrap h1{ font-size: clamp(28px, 5vw, 44px); font-weight: 400; margin-bottom: 20px; }
+  .secret-wrap h1 em{ font-style: italic; color: var(--gold); }
+  .secret-note{ color: var(--text-dim); font-size: 14.5px; font-weight: 300; max-width: 56ch; margin: 0 auto 50px; }
+
+  .secret-close{
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 997;
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  .secret-close:hover{ color: var(--gold); border-color: var(--gold); }
+
+  #secret-timeline{ text-align:left; }
+  .secret-slot{
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 20px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .secret-slot .secret-time{ font-family:'IBM Plex Mono', monospace; font-size: 13px; color: var(--gold); }
+  .secret-slot h4{ font-family:'Fraunces', serif; font-size: 17px; font-weight: 500; margin: 0 0 6px; color: var(--text); }
+  .secret-slot p{ margin:0; font-size: 14px; color: var(--text-dim); font-weight: 300; line-height: 1.6; }
+
   #gate{
     position: fixed;
     inset: 0;
@@ -1237,6 +1341,74 @@
 <!-- ============ SITE ============ -->
 <div id="site">
 
+  <!-- ============ HIDDEN: DAVY'S BIRTHDAY PLAN (Renato only) ============ -->
+  <!-- Reachable only via index.html#secretplan — not linked anywhere in the site -->
+  <div id="secret-gate">
+    <div class="gate-box">
+      <p class="eyebrow">RENATO ONLY</p>
+      <h1>Davy's Birthday <em>Plan</em></h1>
+      <p class="hint">This bit's just for you. Enter the password.</p>
+      <input type="password" id="secret-input" placeholder="Password" autocomplete="off">
+      <button id="secret-submit">Unlock</button>
+      <div id="secret-error"></div>
+    </div>
+  </div>
+
+  <div id="secret-page">
+    <button class="secret-close" onclick="closeSecretPage()">&times; Close</button>
+    <div class="wrap secret-wrap">
+      <p class="eyebrow">DAY 7 · FRIDAY 4 FEBRUARY</p>
+      <h1>Davy's 60th — The Plan</h1>
+      <p class="secret-note">This page only you can see — nothing here shows up anywhere else on the site. Send over the full breakdown and I'll build it out hour by hour below.</p>
+      <div id="secret-timeline">
+        <div class="secret-slot">
+          <span class="secret-time">AM</span>
+          <div><h4>Breakfast, everyone together</h4><p>A nice group breakfast to kick off the day — everyone at the villa, no rush.</p></div>
+        </div>
+        <div class="secret-slot">
+          <span class="secret-time">Early PM</span>
+          <div><h4>Free time — beach optional</h4><p>Anyone who wants to head to the beach can go enjoy it. Open until early afternoon — just need everyone back in time to get ready.</p></div>
+        </div>
+        <div class="secret-slot">
+          <span class="secret-time">2:00 PM</span>
+          <div><h4>Everyone back — festivities begin</h4><p>Hard cutoff. Whatever's happening for the celebration kicks off from here.</p></div>
+        </div>
+        <div class="secret-slot">
+          <span class="secret-time">Afternoon</span>
+          <div><h4>Get changed — party clothes</h4><p>Laid-back party, not anything crazy. Everyone gets changed and ready.</p></div>
+        </div>
+        <div class="secret-slot">
+          <span class="secret-time">4–5 PM</span>
+          <div><h4>Traditional Thai dancers</h4><p>Performance to kick off the evening.</p></div>
+        </div>
+        <div class="secret-slot">
+          <span class="secret-time">6:00 PM</span>
+          <div><h4>Drinks & aperitifs</h4></div>
+        </div>
+        <div class="secret-slot">
+          <span class="secret-time">Dinner</span>
+          <div>
+            <h4>Chef-prepared dinner</h4>
+            <p>
+              Crab to start, then a second starter — maybe prawns.<br>
+              Main: beef or fish, with vegetables alongside.<br>
+              A short break in between to digest.<br>
+              Cheese and wine.
+            </p>
+          </div>
+        </div>
+        <div class="secret-slot">
+          <span class="secret-time">Dessert</span>
+          <div>
+            <h4>The highlight of the evening</h4>
+            <p>Fireworks in the background as dessert comes out. A 3-layer naked cake, made by Renato the day before — fillings still to be decided, built around Davy's favourites. Eating on the terrace, taking in the fireworks and the setting.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <nav class="fab-menu">
     <a href="#top" class="fab-item">
       <span class="fab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
@@ -1894,6 +2066,41 @@
   }
 
   const PASSWORD = normalize("Davy60");
+  const SECRET_PASSWORD = normalize("Fireworks");
+
+  function checkSecretHash(){
+    if(window.location.hash.toLowerCase() === '#secretplan'){
+      if(localStorage.getItem('davy60_secret_unlocked') === '1'){
+        document.getElementById('secret-page').classList.add('open');
+      } else {
+        document.getElementById('secret-gate').classList.add('open');
+      }
+    }
+  }
+  checkSecretHash();
+  window.addEventListener('hashchange', checkSecretHash);
+
+  function trySecretUnlock(){
+    const val = document.getElementById('secret-input').value;
+    const err = document.getElementById('secret-error');
+    if(normalize(val) === SECRET_PASSWORD){
+      err.textContent = '';
+      localStorage.setItem('davy60_secret_unlocked', '1');
+      document.getElementById('secret-gate').classList.remove('open');
+      document.getElementById('secret-page').classList.add('open');
+    } else {
+      err.textContent = "That's not it — try again.";
+    }
+  }
+
+  function closeSecretPage(){
+    document.getElementById('secret-page').classList.remove('open');
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
+
+  document.getElementById('secret-submit').addEventListener('click', trySecretUnlock);
+  document.getElementById('secret-input').addEventListener('keydown', e => { if(e.key === 'Enter') trySecretUnlock(); });
+
 
   function showScreen(id){
     document.querySelectorAll('.gate-screen').forEach(el => el.classList.remove('active'));
